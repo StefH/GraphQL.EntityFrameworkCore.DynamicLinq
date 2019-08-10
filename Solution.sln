@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2010
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{231E7EC1-B4A9-4DB1-B21C-8D8ED136A1DC}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4B7EA302-B0F2-4952-B304-20FC4E51B16C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{ACD435A8-556F-40B3-811C-84EC68EAE06E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.EntityFrameworkCore.DynamicLinq", "src\GraphQL.EntityFrameworkCore.DynamicLinq\GraphQL.EntityFrameworkCore.DynamicLinq.csproj", "{003C2B77-F413-4882-B904-2686C968392D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.EntityFrameworkCore.DynamicLinq.Tests", "tests\GraphQL.EntityFrameworkCore.DynamicLinq.Tests\GraphQL.EntityFrameworkCore.DynamicLinq.Tests.csproj", "{C37D6CFE-A316-49E2-941E-A1702EF06E0B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{003C2B77-F413-4882-B904-2686C968392D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{003C2B77-F413-4882-B904-2686C968392D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{003C2B77-F413-4882-B904-2686C968392D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{003C2B77-F413-4882-B904-2686C968392D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C37D6CFE-A316-49E2-941E-A1702EF06E0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C37D6CFE-A316-49E2-941E-A1702EF06E0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C37D6CFE-A316-49E2-941E-A1702EF06E0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C37D6CFE-A316-49E2-941E-A1702EF06E0B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{003C2B77-F413-4882-B904-2686C968392D} = {4B7EA302-B0F2-4952-B304-20FC4E51B16C}
+		{C37D6CFE-A316-49E2-941E-A1702EF06E0B} = {ACD435A8-556F-40B3-811C-84EC68EAE06E}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8C9F3067-8D49-47A5-B5D1-5C7FA8527166}
+	EndGlobalSection
+EndGlobal
