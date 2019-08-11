@@ -14,7 +14,7 @@ steps:
 
 # Build source, tests and run tests for net452 and netcoreapp2.1 (with coverage)
 - script: |
-    dotnet test ./tests/GraphQL.EntityFrameworkCore.DynamicLinq.Tests/GraphQL.EntityFrameworkCore.DynamicLinq.Tests.csproj --configuration Debug
+    dotnet test ./tests/GraphQL.EntityFrameworkCore.DynamicLinq.Tests/GraphQL.EntityFrameworkCore.DynamicLinq.Tests.csproj --configuration Debug --logger trx /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
   displayName: 'Build source, tests and run tests (with coverage)'
 
 - task: whitesource.ws-bolt.bolt.wss.WhiteSource Bolt@19
@@ -22,7 +22,7 @@ steps:
 
 # Upload coverage to codecov.io
 - script: |
-    %USERPROFILE%\.nuget\packages\codecov\1.7.1\tools\codecov.exe -f "./GraphQL.EntityFrameworkCore.DynamicLinq.Tests/coverage.opencover.xml" -t $(CODECOV_TOKEN)
+    %USERPROFILE%\.nuget\packages\codecov\1.7.1\tools\codecov.exe -f "./tests/GraphQL.EntityFrameworkCore.DynamicLinq.Tests/coverage.opencover.xml" -t $(CODECOV_TOKEN)
   displayName: Upload coverage to codecov.io
 
 - task: PublishTestResults@2
