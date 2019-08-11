@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Text.RegularExpressions;
+using GraphQL.EntityFrameworkCore.DynamicLinq.Constants;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Enumerations;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Models;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Validation;
@@ -74,7 +75,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
             }
             catch (Exception e)
             {
-                _context.Errors.Add(new DynamicQueryableError(e.Message));
+                _context.Errors.Add(new DynamicQueryableError(e.Message, e));
 
                 // In case of an error, just return empty Queryable.
                 return Enumerable.Empty<T>().AsQueryable();
@@ -146,17 +147,22 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
 
         private string BuildPredicate(QueryArgumentInfo info, object value)
         {
-            if (info.IsNonNullGraphType)
-            {
-                return $"{info.EntityPath} == \"{value}\"";
-            }
-
+            var predicates = new List<(string propertyPath, string @operator, object propertyValue)>();
             if (info.QueryArgument.Type == typeof(DateGraphType) && value is DateTime date)
             {
-                return $"np({info.EntityPath}) >= \"{date}\" && np({info.EntityPath}) < \"{date.AddDays(1)}\"";
+                predicates.Add((info.EntityPath, Operator.GreaterThanEqual, date));
+                predicates.Add((info.EntityPath, Operator.LessThan, date.AddDays(1)));
+            }
+            else
+            {
+                predicates.Add((info.EntityPath, Operator.Equal, value));
             }
 
-            return $"np({info.EntityPath}) == \"{value}\"";
+            return string.Join($" {Operator.And} ", predicates.Select(p =>
+            {
+                string wrap = info.IsNonNullGraphType ? p.propertyPath : $"np({p.propertyPath})";
+                return $"{wrap} {p.@operator} \"{p.propertyValue}\"";
+            }));
         }
     }
 }

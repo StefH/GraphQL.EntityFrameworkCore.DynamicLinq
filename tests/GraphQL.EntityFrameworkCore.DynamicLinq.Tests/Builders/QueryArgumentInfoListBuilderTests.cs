@@ -4,6 +4,7 @@ using FluentAssertions;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Builders;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Enumerations;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Resolvers;
+using GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Utils.Entities;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Utils.Types;
 using Moq;
 using Xunit;
@@ -23,6 +24,16 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                 .Returns((Type sourceType, string sourcePath, Type destinationType) => sourcePath);
 
             _sut = new QueryArgumentInfoListBuilder(_propertyPathResolverMock.Object);
+        }
+
+        [Fact]
+        public void Build_With_NonGraphType_ReturnsEmptyQueryArgumentInfoList()
+        {
+            // Act
+            var list = _sut.Build<Room>();
+
+            // Assert
+            list.Should().BeEmpty();
         }
 
         [Fact]

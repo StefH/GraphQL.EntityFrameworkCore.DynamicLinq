@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Builders;
@@ -22,7 +23,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
         public void Build_When_ContextArgumentsIsNull_ReturnsSameQuery()
         {
             // Arrange
-            var queryable = new[] { new Room() }.AsQueryable();
+            var queryable = Enumerable.Empty<Room>().AsQueryable();
             var list = new QueryArgumentInfoList();
             var context = new ResolveFieldContext<object>();
 
@@ -39,7 +40,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
         public void Build_When_ContextArgumentMatchesListArgument_AppliesWhere()
         {
             // Arrange
-            var queryable = new[] { new Room { Id = 1 }, new Room { Id = 42 } }.AsQueryable();
+            var queryable = Enumerable.Empty<Room>().AsQueryable();
             var list = new QueryArgumentInfoList
             {
                 new QueryArgumentInfo
@@ -64,10 +65,10 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
         }
 
         [Fact]
-        public void Build_When_ContextArgumentMatchesListArgumentAndIncludesOrdeBy_AppliesWhereAndOrderBy()
+        public void Build_When_ContextArgumentMatchesListArgumentAndIncludesOrderBy_AppliesWhereAndOrderBy()
         {
             // Arrange
-            var queryable = new[] { new Room { Id = 1 }, new Room { Id = 42 } }.AsQueryable();
+            var queryable = Enumerable.Empty<Room>().AsQueryable();
             var list = new QueryArgumentInfoList
             {
                 new QueryArgumentInfo
@@ -103,6 +104,110 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             // Assert
             _context.Errors.Count.Should().Be(0);
             result.ToString().Should().Contain("Where(Param_0 => (Param_0.Number == 42)).OrderByDescending(Param_1 => Param_1.Name).ThenBy(Param_1 => Param_1.Number)");
+        }
+
+        [Fact]
+        public void Build_When_ContextArgumentIsDateGraphType_AppliesCorrectWhere()
+        {
+            // Arrange
+            var date = new DateTime(2019, 2, 3).Date;
+            var queryable = Enumerable.Empty<Reservation>().AsQueryable();
+            var list = new QueryArgumentInfoList
+            {
+                new QueryArgumentInfo
+                {
+                    QueryArgumentInfoType = QueryArgumentInfoType.DefaultGraphQL,
+                    QueryArgument = new QueryArgument(typeof(DateGraphType)) { Name = "CheckinDate" },
+                    IsNonNullGraphType = true,
+                    GraphQLPath = "CheckinDate",
+                    EntityPath = "CheckinDate"
+                }
+            };
+            _context.Arguments.Add("CheckinDate", date);
+
+            var builder = new DynamicQueryableBuilder<Reservation, object>(queryable, list, _context);
+
+            // Act
+            var result = builder.Build();
+
+            // Assert
+            _context.Errors.Count.Should().Be(0);
+            result.ToString().Should().Contain("Where(Param_0 => ((Param_0.CheckinDate >= 2019-02-03 00:00:00) AndAlso (Param_0.CheckinDate < 2019-02-04 00:00:00))");
+        }
+
+        [Fact]
+        public void Build_When_OrderByIsEmpty_AddsError()
+        {
+            // Arrange
+            var queryable = Enumerable.Empty<Room>().AsQueryable();
+            var list = new QueryArgumentInfoList
+            {
+                new QueryArgumentInfo
+                {
+                    QueryArgumentInfoType = QueryArgumentInfoType.OrderBy,
+                    QueryArgument = new QueryArgument(typeof(StringGraphType)) { Name = "OrderBy" }
+                }
+            };
+            _context.Arguments.Add("OrderBy", "");
+
+            var builder = new DynamicQueryableBuilder<Room, object>(queryable, list, _context);
+
+            // Act
+            builder.Build();
+
+            // Assert
+            _context.Errors.Count.Should().Be(1);
+            _context.Errors[0].Message.Should().Be("The \"OrderBy\" field is empty.");
+        }
+
+        [Fact]
+        public void Build_When_OrderByContainsUndefinedSearchField_AddsError()
+        {
+            // Arrange
+            var queryable = Enumerable.Empty<Room>().AsQueryable();
+            var list = new QueryArgumentInfoList
+            {
+                new QueryArgumentInfo
+                {
+                    QueryArgumentInfoType = QueryArgumentInfoType.OrderBy,
+                    QueryArgument = new QueryArgument(typeof(StringGraphType)) { Name = "OrderBy" }
+                }
+            };
+            _context.Arguments.Add("OrderBy", "test");
+
+            var builder = new DynamicQueryableBuilder<Room, object>(queryable, list, _context);
+
+            // Act
+            builder.Build();
+
+            // Assert
+            _context.Errors.Count.Should().Be(1);
+            _context.Errors[0].Message.Should().Be("The \"OrderBy\" field uses an unknown field \"test\".");
+        }
+
+        [Fact]
+        public void Build_When_OrderByHasAscButIsMissingSearchField_AddsError()
+        {
+            // Arrange
+            var queryable = Enumerable.Empty<Room>().AsQueryable();
+            var list = new QueryArgumentInfoList
+            {
+                new QueryArgumentInfo
+                {
+                    QueryArgumentInfoType = QueryArgumentInfoType.OrderBy,
+                    QueryArgument = new QueryArgument(typeof(StringGraphType)) { Name = "OrderBy" }
+                }
+            };
+            _context.Arguments.Add("OrderBy", "asc");
+
+            var builder = new DynamicQueryableBuilder<Room, object>(queryable, list, _context);
+
+            // Act
+            builder.Build();
+
+            // Assert
+            _context.Errors.Count.Should().Be(1);
+            _context.Errors[0].Message.Should().Be("The \"OrderBy\" field with value \"asc\" cannot be used without a query field.");
         }
     }
 }
