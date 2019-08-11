@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
+using GraphQL.EntityFrameworkCore.DynamicLinq.Builders;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Enumerations;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Models;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Utils.Entities;
@@ -11,7 +12,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
 {
     public class DynamicQueryableBuilderTests
     {
-        private readonly ResolveFieldContext<object> context = new ResolveFieldContext<object>
+        private readonly ResolveFieldContext<object> _context = new ResolveFieldContext<object>
         {
             Arguments = new Dictionary<string, object>(),
             Errors = new ExecutionErrors()
@@ -23,7 +24,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             // Arrange
             var queryable = new[] { new Room() }.AsQueryable();
             var list = new QueryArgumentInfoList();
-            var context = new Types.ResolveFieldContext<object>();
+            var context = new ResolveFieldContext<object>();
 
             var builder = new DynamicQueryableBuilder<Room, object>(queryable, list, context);
 
@@ -50,15 +51,15 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                     EntityPath = "Number"
                 }
             };
-            context.Arguments.Add("Number", 42);
+            _context.Arguments.Add("Number", 42);
 
-            var builder = new DynamicQueryableBuilder<Room, object>(queryable, list, context);
+            var builder = new DynamicQueryableBuilder<Room, object>(queryable, list, _context);
 
             // Act
             var result = builder.Build();
 
             // Assert
-            context.Errors.Count.Should().Be(0);
+            _context.Errors.Count.Should().Be(0);
             result.ToString().Should().Contain("Where(Param_0 => (Param_0.Number == 42))");
         }
 
@@ -91,16 +92,16 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                     QueryArgument = new QueryArgument(typeof(StringGraphType)) { Name = "OrderBy" }
                 }
             };
-            context.Arguments.Add("Number", 42);
-            context.Arguments.Add("OrderBy", "Name desc, Number asc");
+            _context.Arguments.Add("Number", 42);
+            _context.Arguments.Add("OrderBy", "Name desc, Number asc");
 
-            var builder = new DynamicQueryableBuilder<Room, object>(queryable, list, context);
+            var builder = new DynamicQueryableBuilder<Room, object>(queryable, list, _context);
 
             // Act
             var result = builder.Build();
 
             // Assert
-            context.Errors.Count.Should().Be(0);
+            _context.Errors.Count.Should().Be(0);
             result.ToString().Should().Contain("Where(Param_0 => (Param_0.Number == 42)).OrderByDescending(Param_1 => Param_1.Name).ThenBy(Param_1 => Param_1.Number)");
         }
     }
