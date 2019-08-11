@@ -132,7 +132,8 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
 
             // Assert
             _context.Errors.Count.Should().Be(0);
-            result.ToString().Should().Contain("Where(Param_0 => ((Param_0.CheckinDate >= 2019-02-03 00:00:00) AndAlso (Param_0.CheckinDate < 2019-02-04 00:00:00))");
+            result.ToString().Should().Contain("Where(Param_0 => ((Param_0.CheckinDate >=");
+            result.ToString().Should().Contain("AndAlso (Param_0.CheckinDate <");
         }
 
         [Fact]
