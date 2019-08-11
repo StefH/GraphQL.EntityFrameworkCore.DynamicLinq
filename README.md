@@ -109,3 +109,7 @@ public class MyHotelQuery : ObjectGraphType
 3. Optionally add support for OrderBy 
 4. Create a new `QueryArguments` which uses the list.
 5. Call the `ApplyQueryArguments` extension method to apply the seacrh criteria and optionally the OrderBy
+
+
+# References
+- Sample project based on https://github.com/ebicoglu/AspNetCoreGraphQL-MyHotel
