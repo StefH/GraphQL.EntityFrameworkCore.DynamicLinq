@@ -3,6 +3,20 @@
 Add EntityFramework Core Dynamic IQueryable support to GraphQL.
 
 
+## Info
+| | |
+|-|-|
+| ***Quality*** | &nbsp; |
+| &nbsp;&nbsp;**Build Azure** | [![Build Status](https://dev.azure.com/stef/GraphQL.EntityFrameworkCore.DynamicLinq/_apis/build/status/StefH.GraphQL.EntityFrameworkCore.DynamicLinq)](https://dev.azure.com/stef/GraphQL.EntityFrameworkCore.DynamicLinq/_build/latest?definitionId=26) |
+| &nbsp;&nbsp;**Codecov** | [![codecov](https://codecov.io/gh/StefH/GraphQL.EntityFrameworkCore.DynamicLinq/branch/master/graph/badge.svg)](https://codecov.io/gh/StefH/GraphQL.EntityFrameworkCore.DynamicLinq) |
+| |
+| ***NuGet*** | &nbsp; |
+| &nbsp;&nbsp;**WireMock.Net** | [![NuGet: GraphQL.EntityFrameworkCore.DynamicLinq](https://buildstats.info/nuget/GraphQL.EntityFrameworkCore.DynamicLinq)](https://www.nuget.org/packages/GraphQL.EntityFrameworkCore.DynamicLinq)
+ |
+| ***MyGet (previews)*** | &nbsp; |
+| &nbsp;&nbsp;**WireMock.Net** | [![MyGet: GraphQL.EntityFrameworkCore.DynamicLinq](https://buildstats.info/myget/graphql_entityframeworkcore_dynamiclinq/GraphQL.EntityFrameworkCore.DynamicLinq)](https://www.myget.org/feed/graphql_entityframeworkcore_dynamiclinq/package/nuget/GraphQL.EntityFrameworkCore.DynamicLinq) |
+
+
 ## NuGet
 [![GraphQL.EntityFrameworkCore.DynamicLinq](https://buildstats.info/nuget/GraphQL.EntityFrameworkCore.DynamicLinq)](https://www.nuget.org/packages/GraphQL.EntityFrameworkCore.DynamicLinq)
 
