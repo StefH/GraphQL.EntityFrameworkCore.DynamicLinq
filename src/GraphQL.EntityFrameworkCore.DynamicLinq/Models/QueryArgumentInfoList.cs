@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Constants;
-using GraphQL.EntityFrameworkCore.DynamicLinq.Enumerations;
+using GraphQL.EntityFrameworkCore.DynamicLinq.Enums;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Validation;
 using GraphQL.Types;
 using JetBrains.Annotations;
@@ -11,6 +11,16 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
 {
     public class QueryArgumentInfoList : List<QueryArgumentInfo>
     {
+        private static readonly QueryArgumentInfo OrderByQueryArgumentInfo = new QueryArgumentInfo
+        {
+            QueryArgument = new QueryArgument(typeof(StringGraphType))
+            {
+                Name = FieldNames.OrderByFieldName,
+                Description = "Sorts the elements of a sequence in ascending or descending order according to a key."
+            },
+            QueryArgumentInfoType = QueryArgumentInfoType.OrderBy
+        };
+
         /// <summary>
         /// Initializes a new instance of the <see cref="QueryArgumentInfoList"/> class.
         /// </summary>
@@ -28,17 +38,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
         {
             if (this.All(x => x.QueryArgumentInfoType != QueryArgumentInfoType.OrderBy))
             {
-                var orderBy = new QueryArgumentInfo
-                {
-                    QueryArgument = new QueryArgument(typeof(StringGraphType))
-                    {
-                        Name = FieldNames.OrderByFieldName,
-                        Description = "Sorts the elements of a sequence in ascending or descending order according to a key."
-                    },
-                    QueryArgumentInfoType = QueryArgumentInfoType.OrderBy
-                };
-
-                Add(orderBy);
+                Add(OrderByQueryArgumentInfo);
             }
 
             return this;

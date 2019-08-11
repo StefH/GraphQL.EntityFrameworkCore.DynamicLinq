@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using GraphQL.EntityFrameworkCore.DynamicLinq.Enumerations;
+using GraphQL.EntityFrameworkCore.DynamicLinq.Enums;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Extensions;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Models;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Resolvers;
@@ -20,11 +20,13 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
             _propertyPathResolver = propertyPathResolver;
         }
 
+        /// <inheritdoc cref="IQueryArgumentInfoListBuilder.Build{T}" />
         public QueryArgumentInfoList Build<T>()
         {
             return Build(typeof(T));
         }
 
+        /// <inheritdoc cref="IQueryArgumentInfoListBuilder.Build(Type)" />
         public QueryArgumentInfoList Build(Type graphQLType)
         {
             Guard.NotNull(graphQLType, nameof(graphQLType));

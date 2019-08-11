@@ -1,4 +1,4 @@
-﻿using GraphQL.EntityFrameworkCore.DynamicLinq.Enumerations;
+﻿using GraphQL.EntityFrameworkCore.DynamicLinq.Enums;
 using GraphQL.Types;
 
 namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models

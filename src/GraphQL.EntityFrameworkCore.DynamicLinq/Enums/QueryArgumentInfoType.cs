@@ -1,4 +1,4 @@
-﻿namespace GraphQL.EntityFrameworkCore.DynamicLinq.Enumerations
+﻿namespace GraphQL.EntityFrameworkCore.DynamicLinq.Enums
 {
     public enum QueryArgumentInfoType
     {

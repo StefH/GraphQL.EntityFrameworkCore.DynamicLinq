@@ -5,7 +5,7 @@ using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Text.RegularExpressions;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Constants;
-using GraphQL.EntityFrameworkCore.DynamicLinq.Enumerations;
+using GraphQL.EntityFrameworkCore.DynamicLinq.Enums;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Models;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Validation;
 using GraphQL.Types;
@@ -15,24 +15,24 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
 {
     internal class DynamicQueryableBuilder<T, TGraphQL>
     {
-        private const string SortOrderAsc = "asc";
-        private const string SortOrderDesc = "desc";
+        private static string SortOrderAsc = "asc";
+        private static string SortOrderDesc = "desc";
 
         private readonly Regex _orderByRegularExpression = new Regex(@"\w+", RegexOptions.Compiled);
 
-        private readonly IQueryable<T> _query;
+        private readonly IQueryable<T> _queryable;
         private readonly QueryArgumentInfoList _list;
         private readonly ResolveFieldContext<TGraphQL> _context;
 
         private static bool IsSortOrder(string value) => string.Equals(value, SortOrderAsc, StringComparison.OrdinalIgnoreCase) || string.Equals(value, SortOrderDesc, StringComparison.OrdinalIgnoreCase);
 
-        public DynamicQueryableBuilder([NotNull] IQueryable<T> query, [NotNull] QueryArgumentInfoList list, [NotNull] ResolveFieldContext<TGraphQL> context)
+        public DynamicQueryableBuilder([NotNull] IQueryable<T> queryable, [NotNull] QueryArgumentInfoList list, [NotNull] ResolveFieldContext<TGraphQL> context)
         {
-            Guard.NotNull(query, nameof(query));
+            Guard.NotNull(queryable, nameof(queryable));
             Guard.HasNoNulls(list, nameof(list));
             Guard.NotNull(context, nameof(context));
 
-            _query = query;
+            _queryable = queryable;
             _context = context;
             _list = list;
         }
@@ -41,10 +41,10 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
         {
             if (_context.Arguments == null)
             {
-                return _query;
+                return _queryable;
             }
 
-            var newQuery = _query;
+            var newQueryable = _queryable;
             try
             {
                 var orderByItems = new List<(string value, QueryArgumentInfoType type, int index)>();
@@ -58,7 +58,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                     else
                     {
                         var filterQueryArgumentInfo = GetQueryArgumentInfo(argument.Key);
-                        newQuery = newQuery.Where(BuildPredicate(filterQueryArgumentInfo, argument.Value));
+                        newQueryable = newQueryable.Where(BuildPredicate(filterQueryArgumentInfo, argument.Value));
                     }
                 }
 
@@ -70,7 +70,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                         stringBuilder.AppendFormat("{0}{1}", orderByItem.type == QueryArgumentInfoType.DefaultGraphQL ? ',' : ' ', orderByItem.value);
                     }
 
-                    newQuery = newQuery.OrderBy(stringBuilder.ToString().TrimStart(','));
+                    newQueryable = newQueryable.OrderBy(stringBuilder.ToString().TrimStart(','));
                 }
             }
             catch (Exception e)
@@ -81,7 +81,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                 return Enumerable.Empty<T>().AsQueryable();
             }
 
-            return newQuery;
+            return newQueryable;
         }
 
         private bool TryGetOrderBy(string argumentName, object argumentValue, out string orderByStatement)
@@ -150,15 +150,15 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
             var predicates = new List<(string propertyPath, string @operator, object propertyValue)>();
             if (info.QueryArgument.Type == typeof(DateGraphType) && value is DateTime date)
             {
-                predicates.Add((info.EntityPath, Operator.GreaterThanEqual, date));
-                predicates.Add((info.EntityPath, Operator.LessThan, date.AddDays(1)));
+                predicates.Add((info.EntityPath, Operators.GreaterThanEqual, date));
+                predicates.Add((info.EntityPath, Operators.LessThan, date.AddDays(1)));
             }
             else
             {
-                predicates.Add((info.EntityPath, Operator.Equal, value));
+                predicates.Add((info.EntityPath, Operators.Equal, value));
             }
 
-            return string.Join($" {Operator.And} ", predicates.Select(p =>
+            return string.Join($" {Operators.And} ", predicates.Select(p =>
             {
                 string wrap = info.IsNonNullGraphType ? p.propertyPath : $"np({p.propertyPath})";
                 return $"{wrap} {p.@operator} \"{p.propertyValue}\"";

@@ -1,4 +1,4 @@
-﻿using GraphQL.EntityFrameworkCore.DynamicLinq.Enumerations;
+﻿using GraphQL.EntityFrameworkCore.DynamicLinq.Enums;
 
 namespace GraphQL.EntityFrameworkCore.DynamicLinq.Constants
 {
