@@ -1,19 +1,64 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
-trigger:
-- master
-
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'vs2017-win2016'
+
+variables:
+  Prerelease: 'ci'
+  buildId: "$(Build.BuildId)"
+  buildProjects: '**/src/**/*.csproj'
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
+# Print buildId
 - script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    echo "BuildId = $(buildId)"
+  displayName: 'Print buildId'
+
+# Build source, tests and run tests for net452 and netcoreapp2.1 (with coverage)
+- script: |
+    dotnet test ./tests/GraphQL.EntityFrameworkCore.DynamicLinq.Tests/GraphQL.EntityFrameworkCore.DynamicLinq.Tests.csproj --configuration Debug
+  displayName: 'Build source, tests and run tests (with coverage)'
+
+- task: whitesource.ws-bolt.bolt.wss.WhiteSource Bolt@19
+  displayName: 'WhiteSource Bolt'
+
+# Upload coverage to codecov.io
+- script: |
+    %USERPROFILE%\.nuget\packages\codecov\1.7.1\tools\codecov.exe -f "./GraphQL.EntityFrameworkCore.DynamicLinq.Tests/coverage.opencover.xml" -t $(CODECOV_TOKEN)
+  displayName: Upload coverage to codecov.io
+
+- task: PublishTestResults@2
+  inputs:
+    testRunner: VSTest
+    testResultsFiles: '**/*.trx'
+
+# Based on https://whereslou.com/2018/09/versioning-and-publishing-nuget-packages-automatically-using-azure-devops-pipelines/
+- task: DotNetCoreCLI@2
+  displayName: Build Release
+  inputs:
+    command: 'build'
+    arguments: /p:Configuration=Release # https://github.com/MicrosoftDocs/vsts-docs/issues/1976
+    projects: $(buildProjects)
+
+- task: DotNetCoreCLI@2
+  displayName: Pack
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) # Do not run for PullRequests
+  inputs:
+    command: pack
+    configuration: 'Release'
+    packagesToPack: $(buildProjects)
+    nobuild: true
+    packDirectory: '$(Build.ArtifactStagingDirectory)/packages'
+    verbosityPack: 'normal'
+
+- task: PublishBuildArtifacts@1
+  displayName: Publish Artifacts
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) # Do not run for PullRequests
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+
+- task: DotNetCoreCLI@2
+  displayName: Push to MyGet
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) # Do not run for PullRequests
+  inputs:
+    command: custom
+    custom: nuget
+    arguments: push $(Build.ArtifactStagingDirectory)\packages\*.nupkg --source https://www.myget.org/F/graphql_entityframeworkcore_dynamiclinq/api/v3/index.json --no-service-endpoint --api-key $(MyGetKey)
