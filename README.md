@@ -74,10 +74,7 @@ query {
 
 # How to use
 
-#### Install NuGet
-Instal the latest version from GraphQL.EntityFrameworkCore.DynamicLinq from NuGet.
-
-#### Add the required dependency injections
+### Add the required dependency injections
 ``` diff
 public void ConfigureServices(IServiceCollection services)
 {
@@ -85,8 +82,7 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
-
-#### Update your GraphQL Query
+### Update your GraphQL Query
 ``` c#
 public class MyHotelQuery : ObjectGraphType
 {
@@ -113,6 +109,12 @@ public class MyHotelQuery : ObjectGraphType
 4. Create a new `QueryArguments` which uses the list.
 5. Call the `ApplyQueryArguments` extension method to apply the seacrh criteria and optionally the OrderBy
 
+### Example
+See example projec: [examples/MyHotel](https://github.com/StefH/GraphQL.EntityFrameworkCore.DynamicLinq/tree/master/examples/MyHotel) for more details.
+
 
 # References
-- Sample project based on https://github.com/ebicoglu/AspNetCoreGraphQL-MyHotel
+- [Microsoft.EntityFrameworkCore.DynamicLinq](https://github.com/StefH/System.Linq.Dynamic.Core)
+- [EntityFramework Core IQueryable](https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.dbset-1.system-linq-iqueryable-provider)
+- [GraphQL](https://github.com/graphql-dotnet/graphql-dotnet)
+- My example project is based on [ebicoglu/AspNetCoreGraphQL-MyHotel](https://github.com/ebicoglu/AspNetCoreGraphQL-MyHotel).
