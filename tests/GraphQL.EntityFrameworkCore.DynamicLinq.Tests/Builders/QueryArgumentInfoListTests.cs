@@ -16,6 +16,20 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
         }
 
         [Fact]
+        public void SupportPaging_ShouldPagingByQueryArgumentInfo()
+        {
+            // Act
+            var list = _sut.SupportPaging();
+
+            // Assert
+            list.Count.Should().Be(2);
+            list[0].QueryArgument.Name.Should().Be("Page");
+            list[0].QueryArgumentInfoType.Should().Be(QueryArgumentInfoType.Page);
+            list[1].QueryArgument.Name.Should().Be("PageSize");
+            list[1].QueryArgumentInfoType.Should().Be(QueryArgumentInfoType.PageSize);
+        }
+
+        [Fact]
         public void SupportOrderBy_ShouldAddOrderByQueryArgumentInfo()
         {
             // Act

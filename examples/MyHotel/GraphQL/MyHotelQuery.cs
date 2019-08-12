@@ -38,6 +38,15 @@ namespace MyHotel.GraphQL
                     .ToList()
             );
 
+            var roomWithPagingQueryArgumentList = builder.Build<RoomType>().SupportOrderBy().SupportPaging();
+            Field<ListGraphType<RoomType>>("roomsWithPaging",
+                arguments: new QueryArguments(roomWithPagingQueryArgumentList.Select(q => q.QueryArgument)),
+                resolve: context => myHotelRepository.GetRoomsQuery()
+                    .ApplyQueryArguments(roomWithPagingQueryArgumentList, context)
+                    .ProjectTo<RoomModel>(mapper.ConfigurationProvider)
+                    .ToList()
+            );
+
             var flatRoomQueryArgumentList = builder.Build<FlatRoomType>().SupportOrderBy();
             Field<ListGraphType<FlatRoomType>>("flatrooms",
                 arguments: new QueryArguments(flatRoomQueryArgumentList.Select(q => q.QueryArgument)),

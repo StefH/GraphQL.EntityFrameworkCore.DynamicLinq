@@ -11,6 +11,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
 {
     public class QueryArgumentInfoList : List<QueryArgumentInfo>
     {
+        #region QueryArgumentInfo Fields
         private static readonly QueryArgumentInfo OrderByQueryArgumentInfo = new QueryArgumentInfo
         {
             QueryArgument = new QueryArgument(typeof(StringGraphType))
@@ -20,6 +21,27 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
             },
             QueryArgumentInfoType = QueryArgumentInfoType.OrderBy
         };
+
+        private static readonly QueryArgumentInfo PageQueryArgumentInfo = new QueryArgumentInfo
+        {
+            QueryArgument = new QueryArgument(typeof(IntGraphType))
+            {
+                Name = FieldNames.PageFieldName,
+                Description = "The page to return."
+            },
+            QueryArgumentInfoType = QueryArgumentInfoType.Page
+        };
+
+        private static readonly QueryArgumentInfo PageSizeQueryArgumentInfo = new QueryArgumentInfo
+        {
+            QueryArgument = new QueryArgument(typeof(IntGraphType))
+            {
+                Name = FieldNames.PageSizeFieldName,
+                Description = "The number of elements per page."
+            },
+            QueryArgumentInfoType = QueryArgumentInfoType.PageSize
+        };
+        #endregion
 
         /// <summary>
         /// Initializes a new instance of the <see cref="QueryArgumentInfoList"/> class.
@@ -34,11 +56,29 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
         }
 
         [PublicAPI]
+        public bool HasOrderBy => this.Any(x => x.QueryArgumentInfoType == QueryArgumentInfoType.OrderBy);
+
+        [PublicAPI]
+        public bool HasPaging => this.Any(x => x.QueryArgumentInfoType == QueryArgumentInfoType.Page) && this.Any(x => x.QueryArgumentInfoType == QueryArgumentInfoType.PageSize);
+
+        [PublicAPI]
         public QueryArgumentInfoList SupportOrderBy()
         {
-            if (this.All(x => x.QueryArgumentInfoType != QueryArgumentInfoType.OrderBy))
+            if (!HasOrderBy)
             {
                 Add(OrderByQueryArgumentInfo);
+            }
+
+            return this;
+        }
+
+        [PublicAPI]
+        public QueryArgumentInfoList SupportPaging()
+        {
+            if (!HasPaging)
+            {
+                Add(PageQueryArgumentInfo);
+                Add(PageSizeQueryArgumentInfo);
             }
 
             return this;

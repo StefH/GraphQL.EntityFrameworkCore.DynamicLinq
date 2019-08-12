@@ -26,6 +26,10 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
 
         private static bool IsSortOrder(string value) => string.Equals(value, SortOrderAsc, StringComparison.OrdinalIgnoreCase) || string.Equals(value, SortOrderDesc, StringComparison.OrdinalIgnoreCase);
 
+        private static bool IsOrderBy(string argumentName) => string.Equals(argumentName, FieldNames.OrderByFieldName, StringComparison.OrdinalIgnoreCase);
+
+        private static bool IsPaging(string argumentName) => string.Equals(argumentName, FieldNames.PageFieldName, StringComparison.OrdinalIgnoreCase) || string.Equals(argumentName, FieldNames.PageSizeFieldName, StringComparison.OrdinalIgnoreCase);
+
         public DynamicQueryableBuilder([NotNull] IQueryable<T> queryable, [NotNull] QueryArgumentInfoList list, [NotNull] ResolveFieldContext<TGraphQL> context)
         {
             Guard.NotNull(queryable, nameof(queryable));
@@ -44,59 +48,82 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                 return _queryable;
             }
 
-            var newQueryable = _queryable;
             try
             {
-                var orderByItems = new List<(string value, QueryArgumentInfoType type, int index)>();
+                var queryableWhere = ApplyWhere(_queryable);
 
-                foreach (var argument in _context.Arguments)
+                var queryableOrderBy = ApplyOrderBy(queryableWhere);
+
+                return ApplyPaging(queryableOrderBy);
+            }
+            catch (Exception e)
+            {
+                _context.Errors.Add(new DynamicQueryableError(e.Message, e));
+            }
+
+            // In case of an error, just return empty Queryable.
+            return Enumerable.Empty<T>().AsQueryable();
+        }
+
+        private IQueryable<T> ApplyPaging(IQueryable<T> queryable)
+        {
+            if (_list.HasPaging)
+            {
+                var page = _context.GetArgument<int?>(FieldNames.PageFieldName);
+                var pageSize = _context.GetArgument<int?>(FieldNames.PageSizeFieldName);
+                if (page.HasValue && pageSize.HasValue)
                 {
-                    if (TryGetOrderBy(argument.Key, argument.Value, out string orderByStatement))
-                    {
-                        ApplyOrderBy(orderByItems, orderByStatement);
-                    }
-                    else
-                    {
-                        var filterQueryArgumentInfo = GetQueryArgumentInfo(argument.Key);
-                        newQueryable = newQueryable.Where(BuildPredicate(filterQueryArgumentInfo, argument.Value));
-                    }
+                    queryable = queryable.Page(page.Value, pageSize.Value);
                 }
+            }
+
+            return queryable;
+        }
+
+        private IQueryable<T> ApplyWhere(IQueryable<T> queryable)
+        {
+            var wherePredicates = _context.Arguments
+                .Where(argument => !IsPaging(argument.Key) && !IsOrderBy(argument.Key))
+                .Select(argument =>
+                {
+                    var filterQueryArgumentInfo = GetQueryArgumentInfo(argument.Key);
+                    return BuildPredicate(filterQueryArgumentInfo, argument.Value);
+                }).ToArray();
+
+            return wherePredicates.Any() ? queryable.Where(string.Join($" {Operators.And} ", wherePredicates)) : queryable;
+        }
+
+        private IQueryable<T> ApplyOrderBy(IQueryable<T> queryable)
+        {
+            if (_list.HasOrderBy && TryGetOrderBy(_context.GetArgument<string>(FieldNames.OrderByFieldName), out string orderByStatement))
+            {
+                var orderByItems = new List<(string value, QueryArgumentInfoType type, int index)>();
+                ApplyOrderBy(orderByItems, orderByStatement);
 
                 if (orderByItems.Any())
                 {
                     var stringBuilder = new StringBuilder();
                     foreach (var orderByItem in orderByItems)
                     {
-                        stringBuilder.AppendFormat("{0}{1}", orderByItem.type == QueryArgumentInfoType.DefaultGraphQL ? ',' : ' ', orderByItem.value);
+                        stringBuilder.AppendFormat("{0}{1}",
+                            orderByItem.type == QueryArgumentInfoType.DefaultGraphQL ? ',' : ' ', orderByItem.value);
                     }
 
-                    newQueryable = newQueryable.OrderBy(stringBuilder.ToString().TrimStart(','));
+                    queryable = queryable.OrderBy(stringBuilder.ToString().TrimStart(','));
                 }
             }
-            catch (Exception e)
-            {
-                _context.Errors.Add(new DynamicQueryableError(e.Message, e));
 
-                // In case of an error, just return empty Queryable.
-                return Enumerable.Empty<T>().AsQueryable();
-            }
-
-            return newQueryable;
+            return queryable;
         }
 
-        private bool TryGetOrderBy(string argumentName, object argumentValue, out string orderByStatement)
+        private bool TryGetOrderBy(object argumentValue, out string orderByStatement)
         {
             orderByStatement = null;
-            var orderByQueryArgumentInfo = _list.FirstOrDefault(info => info.QueryArgumentInfoType == QueryArgumentInfoType.OrderBy && info.QueryArgument.Name == argumentName);
-            if (orderByQueryArgumentInfo == null)
-            {
-                return false;
-            }
 
             string orderByAsString = argumentValue.ToString();
             if (string.IsNullOrWhiteSpace(orderByAsString))
             {
-                throw new ArgumentException($"The \"{argumentName}\" field is empty.");
+                throw new ArgumentException($"The \"{FieldNames.OrderByFieldName}\" field is empty.");
             }
 
             orderByStatement = orderByAsString;
@@ -142,7 +169,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
             }
 
             // TODO: never thrown?
-            throw new ArgumentException($"Unknown argument \"{argumentName}\" on field \"{_context.FieldName}\" of type \"{_context.Operation.Name}\".");
+            throw new ArgumentException($"Unknown argument \"{argumentName}\" on type \"{typeof(T)}\".");
         }
 
         private string BuildPredicate(QueryArgumentInfo info, object value)
@@ -161,7 +188,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
             return string.Join($" {Operators.And} ", predicates.Select(p =>
             {
                 string wrap = info.IsNonNullGraphType ? p.propertyPath : $"np({p.propertyPath})";
-                return $"{wrap} {p.@operator} \"{p.propertyValue}\"";
+                return $"({wrap} {p.@operator} \"{p.propertyValue}\")";
             }));
         }
     }

@@ -44,20 +44,6 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Validation
         }
 
         [ContractAnnotation("value:null => halt")]
-        public static T NotNull<T>([NoEnumeration] T value, [InvokerParameterName] [NotNull] string parameterName, [NotNull] string propertyName)
-        {
-            if (ReferenceEquals(value, null))
-            {
-                NotNullOrEmpty(parameterName, nameof(parameterName));
-                NotNullOrEmpty(propertyName, nameof(propertyName));
-
-                throw new ArgumentException(CoreStrings.ArgumentPropertyNull(propertyName, parameterName));
-            }
-
-            return value;
-        }
-
-        [ContractAnnotation("value:null => halt")]
         public static IList<T> NotNullOrEmpty<T>(IList<T> value, [InvokerParameterName] [NotNull] string parameterName)
         {
             NotNull(value, parameterName);
@@ -90,19 +76,6 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Validation
                 NotNullOrEmpty(parameterName, nameof(parameterName));
 
                 throw e;
-            }
-
-            return value;
-        }
-
-        public static string NullButNotEmpty(string value, [InvokerParameterName] [NotNull] string parameterName)
-        {
-            if (!ReferenceEquals(value, null)
-                && (value.Length == 0))
-            {
-                NotNullOrEmpty(parameterName, nameof(parameterName));
-
-                throw new ArgumentException(CoreStrings.ArgumentIsEmpty(parameterName));
             }
 
             return value;

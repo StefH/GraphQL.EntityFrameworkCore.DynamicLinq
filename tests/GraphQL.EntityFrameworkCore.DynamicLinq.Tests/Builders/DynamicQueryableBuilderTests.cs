@@ -107,6 +107,54 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
         }
 
         [Fact]
+        public void Build_When_ContextArgumentMatchesListArgumentAndIncludesPaging_AppliesWhereAndPaging()
+        {
+            // Arrange
+            var queryable = Enumerable.Empty<Room>().AsQueryable();
+            var list = new QueryArgumentInfoList
+            {
+                new QueryArgumentInfo
+                {
+                    QueryArgumentInfoType = QueryArgumentInfoType.DefaultGraphQL,
+                    QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "Number" },
+                    IsNonNullGraphType = true,
+                    GraphQLPath = "Number",
+                    EntityPath = "Number"
+                },
+                new QueryArgumentInfo
+                {
+                    QueryArgumentInfoType = QueryArgumentInfoType.DefaultGraphQL,
+                    QueryArgument = new QueryArgument(typeof(StringGraphType)) { Name = "Name" },
+                    IsNonNullGraphType = true,
+                    GraphQLPath = "Name",
+                    EntityPath = "Name"
+                },
+                new QueryArgumentInfo
+                {
+                    QueryArgumentInfoType = QueryArgumentInfoType.Page,
+                    QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "Page" }
+                },
+                new QueryArgumentInfo
+                {
+                    QueryArgumentInfoType = QueryArgumentInfoType.PageSize,
+                    QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "PageSize" }
+                }
+            };
+            _context.Arguments.Add("Number", 42);
+            _context.Arguments.Add("Page", 7);
+            _context.Arguments.Add("PageSize", 3);
+
+            var builder = new DynamicQueryableBuilder<Room, object>(queryable, list, _context);
+
+            // Act
+            var result = builder.Build();
+
+            // Assert
+            _context.Errors.Count.Should().Be(0);
+            result.ToString().Should().Contain("Where(Param_0 => (Param_0.Number == 42)).Skip(18).Take(3)");
+        }
+
+        [Fact]
         public void Build_When_ContextArgumentIsDateGraphType_AppliesCorrectWhere()
         {
             // Arrange

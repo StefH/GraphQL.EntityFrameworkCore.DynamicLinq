@@ -4,6 +4,10 @@
     {
         DefaultGraphQL,
 
-        OrderBy
+        OrderBy,
+
+        Page,
+
+        PageSize
     }
 }

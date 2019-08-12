@@ -103,6 +103,24 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
         }
 
         [Fact]
+        public void Build_With_GraphType_And_SupportPaging_ReturnsCorrectQueryArgumentInfoList()
+        {
+            // Arrange
+            _propertyPathResolverMock.Setup(pr => pr.Resolve(It.IsAny<Type>(), "Id", It.IsAny<Type>())).Returns("Idee");
+
+            // Act
+            var list = _sut.Build<GuestType>().SupportPaging();
+
+            // Assert
+            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.DefaultGraphQL).Should().Be(4);
+            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.OrderBy).Should().Be(0);
+            list.First(q => q.QueryArgumentInfoType == QueryArgumentInfoType.Page).QueryArgument.Name.Should().Be("Page");
+            list.First(q => q.QueryArgumentInfoType == QueryArgumentInfoType.PageSize).QueryArgument.Name.Should().Be("PageSize");
+            list.Select(q => q.GraphQLPath).Should().BeEquivalentTo("Id", "Name", "RegisterDate", "NullableInt", null, null);
+            list.Select(q => q.EntityPath).Should().BeEquivalentTo("Idee", "Name", "RegisterDate", "NullableInt", null, null);
+        }
+
+        [Fact]
         public void Build_With_GraphType_With_NestedGraphTypes_ReturnsCorrectQueryArgumentInfoList()
         {
             // Act
