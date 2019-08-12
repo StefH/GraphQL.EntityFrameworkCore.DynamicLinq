@@ -23,6 +23,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
         private readonly IQueryable<T> _queryable;
         private readonly QueryArgumentInfoList _list;
         private readonly ResolveFieldContext<TGraphQL> _context;
+        private readonly IDictionary<string, object> _arguments;
 
         private static bool IsSortOrder(string value) => string.Equals(value, SortOrderAsc, StringComparison.OrdinalIgnoreCase) || string.Equals(value, SortOrderDesc, StringComparison.OrdinalIgnoreCase);
 
@@ -38,16 +39,12 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
 
             _queryable = queryable;
             _context = context;
+            _arguments = context.Arguments != null ? new Dictionary<string, object>(context.Arguments, StringComparer.OrdinalIgnoreCase) : new Dictionary<string, object>();
             _list = list;
         }
 
         public IQueryable<T> Build()
         {
-            if (_context.Arguments == null)
-            {
-                return _queryable;
-            }
-
             try
             {
                 var queryableWhere = ApplyWhere(_queryable);
@@ -59,22 +56,19 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
             catch (Exception e)
             {
                 _context.Errors.Add(new DynamicQueryableError(e.Message, e));
+                
+                // In case of an error, just return empty Queryable.
+                return Enumerable.Empty<T>().AsQueryable();
             }
-
-            // In case of an error, just return empty Queryable.
-            return Enumerable.Empty<T>().AsQueryable();
         }
 
         private IQueryable<T> ApplyPaging(IQueryable<T> queryable)
         {
             if (_list.HasPaging)
             {
-                var page = _context.GetArgument<int?>(FieldNames.PageFieldName);
-                var pageSize = _context.GetArgument<int?>(FieldNames.PageSizeFieldName);
-                if (page.HasValue && pageSize.HasValue)
-                {
-                    queryable = queryable.Page(page.Value, pageSize.Value);
-                }
+                int page = Convert.ToInt32(_arguments[FieldNames.PageFieldName]);
+                int pageSize = Convert.ToInt32(_arguments[FieldNames.PageSizeFieldName]);
+                queryable = queryable.Page(page, pageSize);
             }
 
             return queryable;
@@ -82,7 +76,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
 
         private IQueryable<T> ApplyWhere(IQueryable<T> queryable)
         {
-            var wherePredicates = _context.Arguments
+            var wherePredicates = _arguments
                 .Where(argument => !IsPaging(argument.Key) && !IsOrderBy(argument.Key))
                 .Select(argument =>
                 {
@@ -95,7 +89,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
 
         private IQueryable<T> ApplyOrderBy(IQueryable<T> queryable)
         {
-            if (_list.HasOrderBy && TryGetOrderBy(_context.GetArgument<string>(FieldNames.OrderByFieldName), out string orderByStatement))
+            if (_list.HasOrderBy && TryGetOrderBy(out string orderByStatement))
             {
                 var orderByItems = new List<(string value, QueryArgumentInfoType type, int index)>();
                 ApplyOrderBy(orderByItems, orderByStatement);
@@ -116,17 +110,20 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
             return queryable;
         }
 
-        private bool TryGetOrderBy(object argumentValue, out string orderByStatement)
+        private bool TryGetOrderBy(out string orderByStatement)
         {
-            orderByStatement = null;
+            if (!_arguments.TryGetValue(FieldNames.OrderByFieldName, out object value))
+            {
+                orderByStatement = null;
+                return false;
+            }
 
-            string orderByAsString = argumentValue.ToString();
-            if (string.IsNullOrWhiteSpace(orderByAsString))
+            orderByStatement = Convert.ToString(value);
+            if (string.IsNullOrWhiteSpace(orderByStatement))
             {
                 throw new ArgumentException($"The \"{FieldNames.OrderByFieldName}\" field is empty.");
             }
 
-            orderByStatement = orderByAsString;
             return true;
         }
 
@@ -162,7 +159,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
 
         private QueryArgumentInfo GetQueryArgumentInfo(string argumentName)
         {
-            var queryArgumentInfo = _list.FirstOrDefault(i => i.QueryArgumentInfoType == QueryArgumentInfoType.DefaultGraphQL && i.QueryArgument.Name == argumentName);
+            var queryArgumentInfo = _list.FirstOrDefault(i => i.QueryArgumentInfoType == QueryArgumentInfoType.DefaultGraphQL && string.Equals(i.QueryArgument.Name, argumentName, StringComparison.OrdinalIgnoreCase));
             if (queryArgumentInfo != null)
             {
                 return queryArgumentInfo;

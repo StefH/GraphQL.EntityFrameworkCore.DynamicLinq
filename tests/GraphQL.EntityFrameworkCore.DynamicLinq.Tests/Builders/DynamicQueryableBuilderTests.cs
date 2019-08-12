@@ -46,13 +46,13 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                 new QueryArgumentInfo
                 {
                     QueryArgumentInfoType = QueryArgumentInfoType.DefaultGraphQL,
-                    QueryArgument = new QueryArgument(typeof(IntGraphType)) {Name = "Number"},
+                    QueryArgument = new QueryArgument(typeof(BooleanGraphType)) { Name = "AllowedSmoking" },
                     IsNonNullGraphType = true,
-                    GraphQLPath = "Number",
-                    EntityPath = "Number"
+                    GraphQLPath = "AllowedSmoking",
+                    EntityPath = "AllowedSmoking"
                 }
             };
-            _context.Arguments.Add("Number", 42);
+            _context.Arguments.Add("allowedSmoking", false);
 
             var builder = new DynamicQueryableBuilder<Room, object>(queryable, list, _context);
 
@@ -61,7 +61,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
 
             // Assert
             _context.Errors.Count.Should().Be(0);
-            result.ToString().Should().Contain("Where(Param_0 => (Param_0.Number == 42))");
+            result.ToString().Should().Contain("Where(Param_0 => (Param_0.AllowedSmoking == False))");
         }
 
         [Fact]
@@ -93,8 +93,8 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                     QueryArgument = new QueryArgument(typeof(StringGraphType)) { Name = "OrderBy" }
                 }
             };
-            _context.Arguments.Add("Number", 42);
-            _context.Arguments.Add("OrderBy", "Name desc, Number asc");
+            _context.Arguments.Add("number", 42);
+            _context.Arguments.Add("orderBy", "Name desc, Number asc");
 
             var builder = new DynamicQueryableBuilder<Room, object>(queryable, list, _context);
 
@@ -140,9 +140,9 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                     QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "PageSize" }
                 }
             };
-            _context.Arguments.Add("Number", 42);
-            _context.Arguments.Add("Page", 7);
-            _context.Arguments.Add("PageSize", 3);
+            _context.Arguments.Add("number", 42);
+            _context.Arguments.Add("page", 7);
+            _context.Arguments.Add("pageSize", 3);
 
             var builder = new DynamicQueryableBuilder<Room, object>(queryable, list, _context);
 
@@ -171,7 +171,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                     EntityPath = "CheckinDate"
                 }
             };
-            _context.Arguments.Add("CheckinDate", date);
+            _context.Arguments.Add("checkinDate", date);
 
             var builder = new DynamicQueryableBuilder<Reservation, object>(queryable, list, _context);
 
@@ -197,7 +197,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                     QueryArgument = new QueryArgument(typeof(StringGraphType)) { Name = "OrderBy" }
                 }
             };
-            _context.Arguments.Add("OrderBy", "");
+            _context.Arguments.Add("orderBy", "");
 
             var builder = new DynamicQueryableBuilder<Room, object>(queryable, list, _context);
 
@@ -222,7 +222,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                     QueryArgument = new QueryArgument(typeof(StringGraphType)) { Name = "OrderBy" }
                 }
             };
-            _context.Arguments.Add("OrderBy", "test");
+            _context.Arguments.Add("orderBy", "test");
 
             var builder = new DynamicQueryableBuilder<Room, object>(queryable, list, _context);
 
@@ -247,7 +247,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                     QueryArgument = new QueryArgument(typeof(StringGraphType)) { Name = "OrderBy" }
                 }
             };
-            _context.Arguments.Add("OrderBy", "asc");
+            _context.Arguments.Add("orderBy", "asc");
 
             var builder = new DynamicQueryableBuilder<Room, object>(queryable, list, _context);
 
