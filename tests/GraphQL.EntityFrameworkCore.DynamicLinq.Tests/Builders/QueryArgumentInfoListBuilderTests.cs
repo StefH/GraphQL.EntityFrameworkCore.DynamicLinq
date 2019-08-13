@@ -46,7 +46,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             var list = _sut.Build<RoomType>();
 
             // Assert
-            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.DefaultGraphQL).Should().Be(8);
+            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(8);
             list.Select(q => q.GraphQLPath).Should().BeEquivalentTo(
                 "Id",
                 "Name",
@@ -79,8 +79,8 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             var list = _sut.Build<GuestType>();
 
             // Assert
-            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.DefaultGraphQL).Should().Be(4);
-            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.DefaultGraphQL && q.IsNonNullGraphType).Should().Be(3);
+            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(4);
+            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL && q.IsNonNullGraphType).Should().Be(3);
             list.Select(q => q.GraphQLPath).Should().BeEquivalentTo("Id", "Name", "RegisterDate", "NullableInt");
             list.Select(q => q.EntityPath).Should().BeEquivalentTo("Idee", "Name", "RegisterDate", "NullableInt");
         }
@@ -95,7 +95,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             var list = _sut.Build<GuestType>().SupportOrderBy();
 
             // Assert
-            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.DefaultGraphQL).Should().Be(4);
+            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(4);
             list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.OrderBy).Should().Be(1);
             list.First(q => q.QueryArgumentInfoType == QueryArgumentInfoType.OrderBy).QueryArgument.Name.Should().Be("OrderBy");
             list.Select(q => q.GraphQLPath).Should().BeEquivalentTo("Id", "Name", "RegisterDate", "NullableInt", null);
@@ -112,10 +112,9 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             var list = _sut.Build<GuestType>().SupportPaging();
 
             // Assert
-            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.DefaultGraphQL).Should().Be(4);
+            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(4);
             list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.OrderBy).Should().Be(0);
-            list.First(q => q.QueryArgumentInfoType == QueryArgumentInfoType.Page).QueryArgument.Name.Should().Be("Page");
-            list.First(q => q.QueryArgumentInfoType == QueryArgumentInfoType.PageSize).QueryArgument.Name.Should().Be("PageSize");
+            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.Paging).Should().Be(2);
             list.Select(q => q.GraphQLPath).Should().BeEquivalentTo("Id", "Name", "RegisterDate", "NullableInt", null, null);
             list.Select(q => q.EntityPath).Should().BeEquivalentTo("Idee", "Name", "RegisterDate", "NullableInt", null, null);
         }
@@ -127,7 +126,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             var list = _sut.Build<ReservationType>();
 
             // Assert
-            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.DefaultGraphQL).Should().Be(15);
+            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(15);
             list.Select(q => q.GraphQLPath).Should().BeEquivalentTo(
                 "Id",
                 "CheckinDate",

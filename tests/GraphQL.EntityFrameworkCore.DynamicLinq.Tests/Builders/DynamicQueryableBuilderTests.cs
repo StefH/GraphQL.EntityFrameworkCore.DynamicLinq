@@ -45,7 +45,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             {
                 new QueryArgumentInfo
                 {
-                    QueryArgumentInfoType = QueryArgumentInfoType.DefaultGraphQL,
+                    QueryArgumentInfoType = QueryArgumentInfoType.GraphQL,
                     QueryArgument = new QueryArgument(typeof(BooleanGraphType)) { Name = "AllowedSmoking" },
                     IsNonNullGraphType = true,
                     GraphQLPath = "AllowedSmoking",
@@ -73,7 +73,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             {
                 new QueryArgumentInfo
                 {
-                    QueryArgumentInfoType = QueryArgumentInfoType.DefaultGraphQL,
+                    QueryArgumentInfoType = QueryArgumentInfoType.GraphQL,
                     QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "Number" },
                     IsNonNullGraphType = true,
                     GraphQLPath = "Number",
@@ -81,7 +81,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                 },
                 new QueryArgumentInfo
                 {
-                    QueryArgumentInfoType = QueryArgumentInfoType.DefaultGraphQL,
+                    QueryArgumentInfoType = QueryArgumentInfoType.GraphQL,
                     QueryArgument = new QueryArgument(typeof(StringGraphType)) { Name = "Name" },
                     IsNonNullGraphType = true,
                     GraphQLPath = "Name",
@@ -115,7 +115,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             {
                 new QueryArgumentInfo
                 {
-                    QueryArgumentInfoType = QueryArgumentInfoType.DefaultGraphQL,
+                    QueryArgumentInfoType = QueryArgumentInfoType.GraphQL,
                     QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "Number" },
                     IsNonNullGraphType = true,
                     GraphQLPath = "Number",
@@ -123,7 +123,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                 },
                 new QueryArgumentInfo
                 {
-                    QueryArgumentInfoType = QueryArgumentInfoType.DefaultGraphQL,
+                    QueryArgumentInfoType = QueryArgumentInfoType.GraphQL,
                     QueryArgument = new QueryArgument(typeof(StringGraphType)) { Name = "Name" },
                     IsNonNullGraphType = true,
                     GraphQLPath = "Name",
@@ -131,12 +131,12 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                 },
                 new QueryArgumentInfo
                 {
-                    QueryArgumentInfoType = QueryArgumentInfoType.Page,
+                    QueryArgumentInfoType = QueryArgumentInfoType.Paging,
                     QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "Page" }
                 },
                 new QueryArgumentInfo
                 {
-                    QueryArgumentInfoType = QueryArgumentInfoType.PageSize,
+                    QueryArgumentInfoType = QueryArgumentInfoType.Paging,
                     QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "PageSize" }
                 }
             };
@@ -164,7 +164,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             {
                 new QueryArgumentInfo
                 {
-                    QueryArgumentInfoType = QueryArgumentInfoType.DefaultGraphQL,
+                    QueryArgumentInfoType = QueryArgumentInfoType.GraphQL,
                     QueryArgument = new QueryArgument(typeof(DateGraphType)) { Name = "CheckinDate" },
                     IsNonNullGraphType = true,
                     GraphQLPath = "CheckinDate",
@@ -182,6 +182,30 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             _context.Errors.Count.Should().Be(0);
             result.ToString().Should().Contain("Where(Param_0 => ((Param_0.CheckinDate >=");
             result.ToString().Should().Contain("AndAlso (Param_0.CheckinDate <");
+        }
+
+        [Fact]
+        public void Build_When_OrderByIsNotPresent_SkipsOrderBy()
+        {
+            // Arrange
+            var queryable = Enumerable.Empty<Room>().AsQueryable();
+            var list = new QueryArgumentInfoList
+            {
+                new QueryArgumentInfo
+                {
+                    QueryArgumentInfoType = QueryArgumentInfoType.OrderBy,
+                    QueryArgument = new QueryArgument(typeof(StringGraphType)) { Name = "OrderBy" }
+                }
+            };
+
+            var builder = new DynamicQueryableBuilder<Room, object>(queryable, list, _context);
+
+            // Act
+            var result = builder.Build();
+
+            // Assert
+            _context.Errors.Count.Should().Be(0);
+            result.ToString().Should().Be("GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Utils.Entities.Room[]");
         }
 
         [Fact]

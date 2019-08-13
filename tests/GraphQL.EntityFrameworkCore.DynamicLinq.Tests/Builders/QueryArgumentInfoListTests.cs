@@ -24,9 +24,9 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             // Assert
             list.Count.Should().Be(2);
             list[0].QueryArgument.Name.Should().Be("Page");
-            list[0].QueryArgumentInfoType.Should().Be(QueryArgumentInfoType.Page);
+            list[0].QueryArgumentInfoType.Should().Be(QueryArgumentInfoType.Paging);
             list[1].QueryArgument.Name.Should().Be("PageSize");
-            list[1].QueryArgumentInfoType.Should().Be(QueryArgumentInfoType.PageSize);
+            list[1].QueryArgumentInfoType.Should().Be(QueryArgumentInfoType.Paging);
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             // Arrange
             var infoId = new QueryArgumentInfo
             {
-                QueryArgumentInfoType = QueryArgumentInfoType.DefaultGraphQL,
+                QueryArgumentInfoType = QueryArgumentInfoType.GraphQL,
                 QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "Id" },
                 IsNonNullGraphType = true,
                 GraphQLPath = "Id",
@@ -56,7 +56,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             _sut.Add(infoId);
             var infoX = new QueryArgumentInfo
             {
-                QueryArgumentInfoType = QueryArgumentInfoType.DefaultGraphQL,
+                QueryArgumentInfoType = QueryArgumentInfoType.GraphQL,
                 QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "X" },
                 IsNonNullGraphType = true,
                 GraphQLPath = "X",
@@ -78,7 +78,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             // Arrange
             var infoId = new QueryArgumentInfo
             {
-                QueryArgumentInfoType = QueryArgumentInfoType.DefaultGraphQL,
+                QueryArgumentInfoType = QueryArgumentInfoType.GraphQL,
                 QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "Id" },
                 IsNonNullGraphType = true,
                 GraphQLPath = "Id",
@@ -87,7 +87,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             _sut.Add(infoId);
             var infoX = new QueryArgumentInfo
             {
-                QueryArgumentInfoType = QueryArgumentInfoType.DefaultGraphQL,
+                QueryArgumentInfoType = QueryArgumentInfoType.GraphQL,
                 QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "X" },
                 IsNonNullGraphType = true,
                 GraphQLPath = "X",

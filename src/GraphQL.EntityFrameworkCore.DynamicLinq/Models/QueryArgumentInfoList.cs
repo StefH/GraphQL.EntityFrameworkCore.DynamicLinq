@@ -29,7 +29,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
                 Name = FieldNames.PageFieldName,
                 Description = "The page to return."
             },
-            QueryArgumentInfoType = QueryArgumentInfoType.Page
+            QueryArgumentInfoType = QueryArgumentInfoType.Paging
         };
 
         private static readonly QueryArgumentInfo PageSizeQueryArgumentInfo = new QueryArgumentInfo
@@ -39,7 +39,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
                 Name = FieldNames.PageSizeFieldName,
                 Description = "The number of elements per page."
             },
-            QueryArgumentInfoType = QueryArgumentInfoType.PageSize
+            QueryArgumentInfoType = QueryArgumentInfoType.Paging
         };
         #endregion
 
@@ -55,11 +55,17 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
             AddRange(collection);
         }
 
-        [PublicAPI]
-        public bool HasOrderBy => this.Any(x => x.QueryArgumentInfoType == QueryArgumentInfoType.OrderBy);
+        internal QueryArgumentInfoList FilterBy(QueryArgumentInfoType type)
+        {
+            return new QueryArgumentInfoList(this.Where(q => q.QueryArgumentInfoType == type));
+        }
 
         [PublicAPI]
-        public bool HasPaging => this.Any(x => x.QueryArgumentInfoType == QueryArgumentInfoType.Page) && this.Any(x => x.QueryArgumentInfoType == QueryArgumentInfoType.PageSize);
+        public bool HasOrderBy => FilterBy(QueryArgumentInfoType.OrderBy).Count > 0;
+
+        [PublicAPI]
+        public bool HasPaging => FilterBy(QueryArgumentInfoType.Paging).Count > 0;
+
 
         [PublicAPI]
         public QueryArgumentInfoList SupportOrderBy()

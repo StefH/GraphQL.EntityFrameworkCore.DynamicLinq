@@ -64,7 +64,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                         GraphQLPath = graphPath,
                         EntityPath = entityPath,
                         IsNonNullGraphType = isNonNullGraphType,
-                        QueryArgumentInfoType = QueryArgumentInfoType.DefaultGraphQL
+                        QueryArgumentInfoType = QueryArgumentInfoType.GraphQL
                     });
                 }
             });
