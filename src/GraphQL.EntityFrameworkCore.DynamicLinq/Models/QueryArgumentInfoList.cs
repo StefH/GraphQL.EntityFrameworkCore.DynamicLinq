@@ -11,38 +11,6 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
 {
     public class QueryArgumentInfoList : List<QueryArgumentInfo>
     {
-        #region QueryArgumentInfo Fields
-        private static readonly QueryArgumentInfo OrderByQueryArgumentInfo = new QueryArgumentInfo
-        {
-            QueryArgument = new QueryArgument(typeof(StringGraphType))
-            {
-                Name = FieldNames.OrderByFieldName,
-                Description = "Sorts the elements of a sequence in ascending or descending order according to a key."
-            },
-            QueryArgumentInfoType = QueryArgumentInfoType.OrderBy
-        };
-
-        private static readonly QueryArgumentInfo PageQueryArgumentInfo = new QueryArgumentInfo
-        {
-            QueryArgument = new QueryArgument(typeof(IntGraphType))
-            {
-                Name = FieldNames.PageFieldName,
-                Description = "The page to return."
-            },
-            QueryArgumentInfoType = QueryArgumentInfoType.Paging
-        };
-
-        private static readonly QueryArgumentInfo PageSizeQueryArgumentInfo = new QueryArgumentInfo
-        {
-            QueryArgument = new QueryArgument(typeof(IntGraphType))
-            {
-                Name = FieldNames.PageSizeFieldName,
-                Description = "The number of elements per page."
-            },
-            QueryArgumentInfoType = QueryArgumentInfoType.Paging
-        };
-        #endregion
-
         /// <summary>
         /// Initializes a new instance of the <see cref="QueryArgumentInfoList"/> class.
         /// </summary>
@@ -68,23 +36,48 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
 
 
         [PublicAPI]
-        public QueryArgumentInfoList SupportOrderBy()
+        public QueryArgumentInfoList SupportOrderBy([CanBeNull] string orderByArgumentName = null)
         {
             if (!HasOrderBy)
             {
-                Add(OrderByQueryArgumentInfo);
+                Add(new QueryArgumentInfo
+                {
+                    QueryArgument = new QueryArgument(typeof(StringGraphType))
+                    {
+                        Name = string.IsNullOrEmpty(orderByArgumentName) ? FieldNames.OrderByFieldName : orderByArgumentName,
+                        Description = "Sorts the elements of a sequence in ascending or descending order according to a key."
+                    },
+                    QueryArgumentInfoType = QueryArgumentInfoType.OrderBy
+                });
             }
 
             return this;
         }
 
         [PublicAPI]
-        public QueryArgumentInfoList SupportPaging()
+        public QueryArgumentInfoList SupportPaging([CanBeNull] string pageArgumentName = null, [CanBeNull] string pageSizeArgumentName = null)
         {
             if (!HasPaging)
             {
-                Add(PageQueryArgumentInfo);
-                Add(PageSizeQueryArgumentInfo);
+                Add(new QueryArgumentInfo
+                {
+                    QueryArgument = new QueryArgument(typeof(IntGraphType))
+                    {
+                        Name = string.IsNullOrEmpty(pageArgumentName) ? FieldNames.PageFieldName : pageArgumentName,
+                        Description = "The page to return."
+                    },
+                    QueryArgumentInfoType = QueryArgumentInfoType.Paging
+                });
+
+                Add(new QueryArgumentInfo
+                {
+                    QueryArgument = new QueryArgument(typeof(IntGraphType))
+                    {
+                        Name = string.IsNullOrEmpty(pageSizeArgumentName) ? FieldNames.PageSizeFieldName : pageSizeArgumentName,
+                        Description = "The number of elements per page."
+                    },
+                    QueryArgumentInfoType = QueryArgumentInfoType.Paging
+                });
             }
 
             return this;

@@ -16,7 +16,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
         }
 
         [Fact]
-        public void SupportPaging_ShouldPagingByQueryArgumentInfo()
+        public void SupportPaging_Should_AddPagingByQueryArgumentInfos()
         {
             // Act
             var list = _sut.SupportPaging();
@@ -30,7 +30,21 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
         }
 
         [Fact]
-        public void SupportOrderBy_ShouldAddOrderByQueryArgumentInfo()
+        public void SupportPaging_WithCustomArgumentName_Should_AddPagingByQueryArgumentInfos()
+        {
+            // Act
+            var list = _sut.SupportPaging("x", "y");
+
+            // Assert
+            list.Count.Should().Be(2);
+            list[0].QueryArgument.Name.Should().Be("x");
+            list[0].QueryArgumentInfoType.Should().Be(QueryArgumentInfoType.Paging);
+            list[1].QueryArgument.Name.Should().Be("y");
+            list[1].QueryArgumentInfoType.Should().Be(QueryArgumentInfoType.Paging);
+        }
+
+        [Fact]
+        public void SupportOrderBy_Should_AddOrderByQueryArgumentInfo()
         {
             // Act
             var list = _sut.SupportOrderBy();
@@ -38,6 +52,18 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             // Assert
             list.Count.Should().Be(1);
             list[0].QueryArgument.Name.Should().Be("OrderBy");
+            list[0].QueryArgumentInfoType.Should().Be(QueryArgumentInfoType.OrderBy);
+        }
+
+        [Fact]
+        public void SupportOrderBy_WithCustomArgumentName_AddOrderByQueryArgumentInfo()
+        {
+            // Act
+            var list = _sut.SupportOrderBy("o");
+
+            // Assert
+            list.Count.Should().Be(1);
+            list[0].QueryArgument.Name.Should().Be("o");
             list[0].QueryArgumentInfoType.Should().Be(QueryArgumentInfoType.OrderBy);
         }
 
@@ -101,6 +127,28 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             // Assert
             list.Count.Should().Be(1);
             list[0].Should().Be(infoX);
+        }
+
+        [Fact]
+        public void Include_WithCustomArgumentName_AddOrderByQueryArgumentInfo()
+        {
+            // Arrange
+            var infoId = new QueryArgumentInfo
+            {
+                QueryArgumentInfoType = QueryArgumentInfoType.GraphQL,
+                QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "Id" },
+                IsNonNullGraphType = true,
+                GraphQLPath = "Id",
+                EntityPath = "Id"
+            };
+            _sut.Add(infoId);
+
+            // Act
+            var list = _sut.Filter(graphQLPath => graphQLPath == "Id");
+
+            // Assert
+            list.Count.Should().Be(1);
+            list[0].Should().Be(infoId);
         }
     }
 }
