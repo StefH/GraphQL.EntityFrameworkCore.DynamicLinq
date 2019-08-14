@@ -22,6 +22,8 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.DependencyInjection
         {
             Guard.NotNull(services, nameof(services));
 
+            services.AddOptions();
+
             services.AddServices();
         }
 

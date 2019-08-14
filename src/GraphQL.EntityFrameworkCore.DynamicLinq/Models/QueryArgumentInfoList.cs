@@ -34,6 +34,14 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
         [PublicAPI]
         public bool HasPaging => FilterBy(QueryArgumentInfoType.Paging).Count > 0;
 
+        /// <summary>
+        /// Converts this object into a <see cref="QueryArguments"/> object.
+        /// </summary>
+        [PublicAPI]
+        public QueryArguments ToQueryArguments()
+        {
+            return new QueryArguments(this.Select(info => info.QueryArgument));
+        }
 
         [PublicAPI]
         public QueryArgumentInfoList SupportOrderBy([CanBeNull] string orderByArgumentName = null)

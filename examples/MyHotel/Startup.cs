@@ -3,6 +3,7 @@ using AutoMapper;
 using GraphQL;
 using GraphQL.Client;
 using GraphQL.EntityFrameworkCore.DynamicLinq.DependencyInjection;
+using GraphQL.EntityFrameworkCore.DynamicLinq.Options;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Resolvers;
 using GraphQL.Server;
 using GraphQL.Server.Ui.Playground;
@@ -43,6 +44,7 @@ namespace MyHotel
             services.AddSingleton(t => new GraphQLClient(Configuration["GraphQlEndpoint"]));
             services.AddSingleton<ReservationGraphqlClient>();
 
+            services.Configure<QueryArgumentInfoListBuilderOptions>(Configuration.GetSection("QueryArgumentInfoListBuilderOptions"));
             services.AddGraphQLEntityFrameworkCoreDynamicLinq();
             services.AddScoped<IPropertyPathResolver, AutoMapperPropertyPathResolver>();
             //***</ My services >*** 
