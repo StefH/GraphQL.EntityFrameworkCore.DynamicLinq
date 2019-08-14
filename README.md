@@ -91,13 +91,14 @@ public class MyHotelQuery : ObjectGraphType
     {
 1       var roomQueryArgumentList = builder.Build<RoomType>()
 2           .Exclude("Id")
-3           .SupportOrderBy();
+3           .SupportOrderBy()
+4           .Supportpaging();
 
         Field<ListGraphType<RoomType>>("rooms",
-4           arguments: roomQueryArgumentList.ToQueryArguments(),
+5           arguments: roomQueryArgumentList.ToQueryArguments(),
 
             resolve: context => myHotelRepository.GetRoomsQuery()
-5               .ApplyQueryArguments(roomQueryArgumentList, context)
+6               .ApplyQueryArguments(roomQueryArgumentList, context)
                 .ToList()
         );
     }
@@ -106,9 +107,10 @@ public class MyHotelQuery : ObjectGraphType
 
 1. Use the `IQueryArgumentInfoListBuilder` to build all possible arguments based on the fields from the GraphQL type (e.g. `RoomType`)
 2. Optionally exclude some properties which should not be searchable
-3. Optionally add support for OrderBy 
-4. Call the `.ToQueryArguments()` to craete a new `QueryArguments`.
-5. Call the `ApplyQueryArguments` extension method to apply the seacrh criteria and optionally the OrderBy
+3. Optionally add support for OrderBy (argument-name will be `OrderBy`)
+4. Optionally add support for Paging (argument-names will be `Page` and `PageSize`)
+5. Call the `.ToQueryArguments()` to craete a new `QueryArguments`.
+6. Call the `ApplyQueryArguments` extension method to apply the seacrh criteria and optionally the OrderBy
 
 ### Example
 See example projec: [examples/MyHotel](https://github.com/StefH/GraphQL.EntityFrameworkCore.DynamicLinq/tree/master/examples/MyHotel) for more details.
