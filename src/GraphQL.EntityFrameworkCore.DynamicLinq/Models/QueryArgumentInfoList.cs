@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Constants;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Enums;
+using GraphQL.EntityFrameworkCore.DynamicLinq.Matchers;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Validation;
 using GraphQL.Types;
 using JetBrains.Annotations;
@@ -11,16 +12,6 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
 {
     public class QueryArgumentInfoList : List<QueryArgumentInfo>
     {
-        private static readonly QueryArgumentInfo OrderByQueryArgumentInfo = new QueryArgumentInfo
-        {
-            QueryArgument = new QueryArgument(typeof(StringGraphType))
-            {
-                Name = FieldNames.OrderByFieldName,
-                Description = "Sorts the elements of a sequence in ascending or descending order according to a key."
-            },
-            QueryArgumentInfoType = QueryArgumentInfoType.OrderBy
-        };
-
         /// <summary>
         /// Initializes a new instance of the <see cref="QueryArgumentInfoList"/> class.
         /// </summary>
@@ -33,12 +24,69 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
             AddRange(collection);
         }
 
-        [PublicAPI]
-        public QueryArgumentInfoList SupportOrderBy()
+        internal QueryArgumentInfoList FilterBy(QueryArgumentInfoType type)
         {
-            if (this.All(x => x.QueryArgumentInfoType != QueryArgumentInfoType.OrderBy))
+            return new QueryArgumentInfoList(this.Where(q => q.QueryArgumentInfoType == type));
+        }
+
+        [PublicAPI]
+        public bool HasOrderBy => FilterBy(QueryArgumentInfoType.OrderBy).Count > 0;
+
+        [PublicAPI]
+        public bool HasPaging => FilterBy(QueryArgumentInfoType.Paging).Count > 0;
+
+        /// <summary>
+        /// Converts this object into a <see cref="QueryArguments"/> object.
+        /// </summary>
+        [PublicAPI]
+        public QueryArguments ToQueryArguments()
+        {
+            return new QueryArguments(this.Select(info => info.QueryArgument));
+        }
+
+        [PublicAPI]
+        public QueryArgumentInfoList SupportOrderBy([CanBeNull] string orderByArgumentName = null)
+        {
+            if (!HasOrderBy)
             {
-                Add(OrderByQueryArgumentInfo);
+                Add(new QueryArgumentInfo
+                {
+                    QueryArgument = new QueryArgument(typeof(StringGraphType))
+                    {
+                        Name = string.IsNullOrEmpty(orderByArgumentName) ? FieldNames.OrderByFieldName : orderByArgumentName,
+                        Description = "Sorts the elements of a sequence in ascending or descending order according to a key."
+                    },
+                    QueryArgumentInfoType = QueryArgumentInfoType.OrderBy
+                });
+            }
+
+            return this;
+        }
+
+        [PublicAPI]
+        public QueryArgumentInfoList SupportPaging([CanBeNull] string pageArgumentName = null, [CanBeNull] string pageSizeArgumentName = null)
+        {
+            if (!HasPaging)
+            {
+                Add(new QueryArgumentInfo
+                {
+                    QueryArgument = new QueryArgument(typeof(IntGraphType))
+                    {
+                        Name = string.IsNullOrEmpty(pageArgumentName) ? FieldNames.PageFieldName : pageArgumentName,
+                        Description = "The page to return."
+                    },
+                    QueryArgumentInfoType = QueryArgumentInfoType.Paging
+                });
+
+                Add(new QueryArgumentInfo
+                {
+                    QueryArgument = new QueryArgument(typeof(IntGraphType))
+                    {
+                        Name = string.IsNullOrEmpty(pageSizeArgumentName) ? FieldNames.PageSizeFieldName : pageSizeArgumentName,
+                        Description = "The number of elements per page."
+                    },
+                    QueryArgumentInfoType = QueryArgumentInfoType.Paging
+                });
             }
 
             return this;
@@ -49,7 +97,9 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
         {
             Guard.HasNoNulls(includedGraphQLPropertyPaths, nameof(includedGraphQLPropertyPaths));
 
-            return new QueryArgumentInfoList(this.Where(q => includedGraphQLPropertyPaths.Contains(q.GraphQLPath)));
+            var matcher = new WildcardMatcher(MatchBehaviour.AcceptOnMatch, includedGraphQLPropertyPaths);
+
+            return new QueryArgumentInfoList(this.Where(q => MatchScores.IsPerfect(matcher.IsMatch(q.GraphQLPath))));
         }
 
         [PublicAPI]
@@ -57,7 +107,9 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
         {
             Guard.HasNoNulls(excludedGraphQLPropertyPaths, nameof(excludedGraphQLPropertyPaths));
 
-            return new QueryArgumentInfoList(this.Where(q => !excludedGraphQLPropertyPaths.Contains(q.GraphQLPath)));
+            var matcher = new WildcardMatcher(MatchBehaviour.RejectOnMatch, excludedGraphQLPropertyPaths);
+
+            return new QueryArgumentInfoList(this.Where(q => MatchScores.IsPerfect(matcher.IsMatch(q.GraphQLPath))));
         }
 
         [PublicAPI]

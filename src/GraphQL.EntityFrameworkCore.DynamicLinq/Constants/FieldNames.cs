@@ -1,9 +1,11 @@
-﻿using GraphQL.EntityFrameworkCore.DynamicLinq.Enums;
-
-namespace GraphQL.EntityFrameworkCore.DynamicLinq.Constants
+﻿namespace GraphQL.EntityFrameworkCore.DynamicLinq.Constants
 {
     internal static class FieldNames
     {
-        public static string OrderByFieldName = QueryArgumentInfoType.OrderBy.ToString();
+        public const string OrderByFieldName = "OrderBy";
+
+        public const string PageFieldName = "Page";
+
+        public const string PageSizeFieldName = "PageSize";
     }
 }

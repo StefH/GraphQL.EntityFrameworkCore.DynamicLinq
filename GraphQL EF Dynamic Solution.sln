@@ -6,7 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{231E7EC1-B4A9-4DB1-B21C-8D8ED136A1DC}"
 	ProjectSection(SolutionItems) = preProject
 		azure-pipelines.yml = azure-pipelines.yml
+		CHANGELOG.md = CHANGELOG.md
 		Directory.Build.props = Directory.Build.props
+		GitHubReleaseNotes.txt = GitHubReleaseNotes.txt
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -16,7 +18,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{ACD435A8
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.EntityFrameworkCore.DynamicLinq", "src\GraphQL.EntityFrameworkCore.DynamicLinq\GraphQL.EntityFrameworkCore.DynamicLinq.csproj", "{003C2B77-F413-4882-B904-2686C968392D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.EntityFrameworkCore.DynamicLinq.Tests", "tests\GraphQL.EntityFrameworkCore.DynamicLinq.Tests\GraphQL.EntityFrameworkCore.DynamicLinq.Tests.csproj", "{C37D6CFE-A316-49E2-941E-A1702EF06E0B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.EntityFrameworkCore.DynamicLinq.Tests", "tests\GraphQL.EntityFrameworkCore.DynamicLinq.Tests\GraphQL.EntityFrameworkCore.DynamicLinq.Tests.csproj", "{31DC2567-C3FE-467D-84BE-FB5D956E6121}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{2F2D7F80-54B5-41C3-BD5F-99E2600CA96B}"
 EndProject
@@ -32,10 +34,10 @@ Global
 		{003C2B77-F413-4882-B904-2686C968392D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{003C2B77-F413-4882-B904-2686C968392D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{003C2B77-F413-4882-B904-2686C968392D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C37D6CFE-A316-49E2-941E-A1702EF06E0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C37D6CFE-A316-49E2-941E-A1702EF06E0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C37D6CFE-A316-49E2-941E-A1702EF06E0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C37D6CFE-A316-49E2-941E-A1702EF06E0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31DC2567-C3FE-467D-84BE-FB5D956E6121}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31DC2567-C3FE-467D-84BE-FB5D956E6121}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31DC2567-C3FE-467D-84BE-FB5D956E6121}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31DC2567-C3FE-467D-84BE-FB5D956E6121}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4A008F05-F810-4CBD-8F77-809085CA4EF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4A008F05-F810-4CBD-8F77-809085CA4EF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A008F05-F810-4CBD-8F77-809085CA4EF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -46,7 +48,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{003C2B77-F413-4882-B904-2686C968392D} = {4B7EA302-B0F2-4952-B304-20FC4E51B16C}
-		{C37D6CFE-A316-49E2-941E-A1702EF06E0B} = {ACD435A8-556F-40B3-811C-84EC68EAE06E}
+		{31DC2567-C3FE-467D-84BE-FB5D956E6121} = {ACD435A8-556F-40B3-811C-84EC68EAE06E}
 		{4A008F05-F810-4CBD-8F77-809085CA4EF2} = {2F2D7F80-54B5-41C3-BD5F-99E2600CA96B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

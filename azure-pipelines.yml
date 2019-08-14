@@ -1,5 +1,5 @@
 pool:
-  vmImage: 'vs2017-win2016'
+  vmImage: 'windows-2019'
 
 variables:
   Prerelease: 'ci'
@@ -12,7 +12,7 @@ steps:
     echo "BuildId = $(buildId)"
   displayName: 'Print buildId'
 
-# Build source, tests and run tests for net452 and netcoreapp2.1 (with coverage)
+# Build source, tests and run tests for netcoreapp2.2 (with coverage)
 - script: |
     dotnet test ./tests/GraphQL.EntityFrameworkCore.DynamicLinq.Tests/GraphQL.EntityFrameworkCore.DynamicLinq.Tests.csproj --configuration Debug --logger trx /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
   displayName: 'Build source, tests and run tests (with coverage)'

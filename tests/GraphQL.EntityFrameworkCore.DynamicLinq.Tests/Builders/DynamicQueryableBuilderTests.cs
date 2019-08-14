@@ -45,14 +45,14 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             {
                 new QueryArgumentInfo
                 {
-                    QueryArgumentInfoType = QueryArgumentInfoType.DefaultGraphQL,
-                    QueryArgument = new QueryArgument(typeof(IntGraphType)) {Name = "Number"},
+                    QueryArgumentInfoType = QueryArgumentInfoType.GraphQL,
+                    QueryArgument = new QueryArgument(typeof(BooleanGraphType)) { Name = "AllowedSmoking" },
                     IsNonNullGraphType = true,
-                    GraphQLPath = "Number",
-                    EntityPath = "Number"
+                    GraphQLPath = "AllowedSmoking",
+                    EntityPath = "AllowedSmoking"
                 }
             };
-            _context.Arguments.Add("Number", 42);
+            _context.Arguments.Add("allowedSmoking", false);
 
             var builder = new DynamicQueryableBuilder<Room, object>(queryable, list, _context);
 
@@ -61,7 +61,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
 
             // Assert
             _context.Errors.Count.Should().Be(0);
-            result.ToString().Should().Contain("Where(Param_0 => (Param_0.Number == 42))");
+            result.ToString().Should().Contain("Where(Param_0 => (Param_0.AllowedSmoking == False))");
         }
 
         [Fact]
@@ -73,7 +73,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             {
                 new QueryArgumentInfo
                 {
-                    QueryArgumentInfoType = QueryArgumentInfoType.DefaultGraphQL,
+                    QueryArgumentInfoType = QueryArgumentInfoType.GraphQL,
                     QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "Number" },
                     IsNonNullGraphType = true,
                     GraphQLPath = "Number",
@@ -81,7 +81,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                 },
                 new QueryArgumentInfo
                 {
-                    QueryArgumentInfoType = QueryArgumentInfoType.DefaultGraphQL,
+                    QueryArgumentInfoType = QueryArgumentInfoType.GraphQL,
                     QueryArgument = new QueryArgument(typeof(StringGraphType)) { Name = "Name" },
                     IsNonNullGraphType = true,
                     GraphQLPath = "Name",
@@ -93,8 +93,8 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                     QueryArgument = new QueryArgument(typeof(StringGraphType)) { Name = "OrderBy" }
                 }
             };
-            _context.Arguments.Add("Number", 42);
-            _context.Arguments.Add("OrderBy", "Name desc, Number asc");
+            _context.Arguments.Add("number", 42);
+            _context.Arguments.Add("orderBy", "Name desc, Number asc");
 
             var builder = new DynamicQueryableBuilder<Room, object>(queryable, list, _context);
 
@@ -107,6 +107,54 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
         }
 
         [Fact]
+        public void Build_When_ContextArgumentMatchesListArgumentAndIncludesPaging_AppliesWhereAndPaging()
+        {
+            // Arrange
+            var queryable = Enumerable.Empty<Room>().AsQueryable();
+            var list = new QueryArgumentInfoList
+            {
+                new QueryArgumentInfo
+                {
+                    QueryArgumentInfoType = QueryArgumentInfoType.GraphQL,
+                    QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "Number" },
+                    IsNonNullGraphType = true,
+                    GraphQLPath = "Number",
+                    EntityPath = "Number"
+                },
+                new QueryArgumentInfo
+                {
+                    QueryArgumentInfoType = QueryArgumentInfoType.GraphQL,
+                    QueryArgument = new QueryArgument(typeof(StringGraphType)) { Name = "Name" },
+                    IsNonNullGraphType = true,
+                    GraphQLPath = "Name",
+                    EntityPath = "Name"
+                },
+                new QueryArgumentInfo
+                {
+                    QueryArgumentInfoType = QueryArgumentInfoType.Paging,
+                    QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "Page" }
+                },
+                new QueryArgumentInfo
+                {
+                    QueryArgumentInfoType = QueryArgumentInfoType.Paging,
+                    QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "PageSize" }
+                }
+            };
+            _context.Arguments.Add("number", 42);
+            _context.Arguments.Add("page", 7);
+            _context.Arguments.Add("pageSize", 3);
+
+            var builder = new DynamicQueryableBuilder<Room, object>(queryable, list, _context);
+
+            // Act
+            var result = builder.Build();
+
+            // Assert
+            _context.Errors.Count.Should().Be(0);
+            result.ToString().Should().Contain("Where(Param_0 => (Param_0.Number == 42)).Skip(18).Take(3)");
+        }
+
+        [Fact]
         public void Build_When_ContextArgumentIsDateGraphType_AppliesCorrectWhere()
         {
             // Arrange
@@ -116,14 +164,14 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             {
                 new QueryArgumentInfo
                 {
-                    QueryArgumentInfoType = QueryArgumentInfoType.DefaultGraphQL,
+                    QueryArgumentInfoType = QueryArgumentInfoType.GraphQL,
                     QueryArgument = new QueryArgument(typeof(DateGraphType)) { Name = "CheckinDate" },
                     IsNonNullGraphType = true,
                     GraphQLPath = "CheckinDate",
                     EntityPath = "CheckinDate"
                 }
             };
-            _context.Arguments.Add("CheckinDate", date);
+            _context.Arguments.Add("checkinDate", date);
 
             var builder = new DynamicQueryableBuilder<Reservation, object>(queryable, list, _context);
 
@@ -134,6 +182,30 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             _context.Errors.Count.Should().Be(0);
             result.ToString().Should().Contain("Where(Param_0 => ((Param_0.CheckinDate >=");
             result.ToString().Should().Contain("AndAlso (Param_0.CheckinDate <");
+        }
+
+        [Fact]
+        public void Build_When_OrderByIsNotPresent_SkipsOrderBy()
+        {
+            // Arrange
+            var queryable = Enumerable.Empty<Room>().AsQueryable();
+            var list = new QueryArgumentInfoList
+            {
+                new QueryArgumentInfo
+                {
+                    QueryArgumentInfoType = QueryArgumentInfoType.OrderBy,
+                    QueryArgument = new QueryArgument(typeof(StringGraphType)) { Name = "OrderBy" }
+                }
+            };
+
+            var builder = new DynamicQueryableBuilder<Room, object>(queryable, list, _context);
+
+            // Act
+            var result = builder.Build();
+
+            // Assert
+            _context.Errors.Count.Should().Be(0);
+            result.ToString().Should().Be("GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Utils.Entities.Room[]");
         }
 
         [Fact]
@@ -149,7 +221,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                     QueryArgument = new QueryArgument(typeof(StringGraphType)) { Name = "OrderBy" }
                 }
             };
-            _context.Arguments.Add("OrderBy", "");
+            _context.Arguments.Add("orderBy", "");
 
             var builder = new DynamicQueryableBuilder<Room, object>(queryable, list, _context);
 
@@ -174,7 +246,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                     QueryArgument = new QueryArgument(typeof(StringGraphType)) { Name = "OrderBy" }
                 }
             };
-            _context.Arguments.Add("OrderBy", "test");
+            _context.Arguments.Add("orderBy", "test");
 
             var builder = new DynamicQueryableBuilder<Room, object>(queryable, list, _context);
 
@@ -199,7 +271,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                     QueryArgument = new QueryArgument(typeof(StringGraphType)) { Name = "OrderBy" }
                 }
             };
-            _context.Arguments.Add("OrderBy", "asc");
+            _context.Arguments.Add("orderBy", "asc");
 
             var builder = new DynamicQueryableBuilder<Room, object>(queryable, list, _context);
 

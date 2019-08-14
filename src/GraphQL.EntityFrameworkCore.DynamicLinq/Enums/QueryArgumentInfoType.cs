@@ -2,8 +2,10 @@
 {
     public enum QueryArgumentInfoType
     {
-        DefaultGraphQL,
+        GraphQL,
 
-        OrderBy
+        OrderBy,
+
+        Paging
     }
 }

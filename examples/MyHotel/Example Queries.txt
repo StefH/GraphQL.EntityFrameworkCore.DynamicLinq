@@ -43,6 +43,19 @@ query {
 }
 
 query {
+  roomsWithPaging (page: 1, pageSize: 2) {
+    id
+    name
+    number
+    status
+    detail {
+      beds
+      windows
+    }
+  }
+}
+
+query {
   flatrooms(beds: 2) {
     name
     number

@@ -78,6 +78,7 @@ query {
 ``` diff
 public void ConfigureServices(IServiceCollection services)
 {
++    services.Configure<QueryArgumentInfoListBuilderOptions>(Configuration.GetSection("QueryArgumentInfoListBuilderOptions"));
 +    services.AddGraphQLEntityFrameworkCoreDynamicLinq();
 }
 ```
@@ -90,13 +91,14 @@ public class MyHotelQuery : ObjectGraphType
     {
 1       var roomQueryArgumentList = builder.Build<RoomType>()
 2           .Exclude("Id")
-3           .SupportOrderBy();
+3           .SupportOrderBy()
+4           .Supportpaging();
 
         Field<ListGraphType<RoomType>>("rooms",
-4           arguments: new QueryArguments(roomQueryArgumentList.Select(q => q.QueryArgument)),
+5           arguments: roomQueryArgumentList.ToQueryArguments(),
 
             resolve: context => myHotelRepository.GetRoomsQuery()
-5               .ApplyQueryArguments(roomQueryArgumentList, context)
+6               .ApplyQueryArguments(roomQueryArgumentList, context)
                 .ToList()
         );
     }
@@ -104,10 +106,11 @@ public class MyHotelQuery : ObjectGraphType
 ```
 
 1. Use the `IQueryArgumentInfoListBuilder` to build all possible arguments based on the fields from the GraphQL type (e.g. `RoomType`)
-2. Optionally exclude some properties which should not be searchable
-3. Optionally add support for OrderBy 
-4. Create a new `QueryArguments` which uses the list.
-5. Call the `ApplyQueryArguments` extension method to apply the seacrh criteria and optionally the OrderBy
+2. Optionally include/exclude some properties which should not be searchable (this can also be a wildcard like `*Id`)
+3. Optionally add support for OrderBy (argument-name will be `OrderBy`)
+4. Optionally add support for Paging (argument-names will be `Page` and `PageSize`)
+5. Call the `.ToQueryArguments()` to create a new `QueryArguments` object.
+6. Call the `ApplyQueryArguments` extension method to apply the seacrh criteria (optionally the OrderBy and Paging)
 
 ### Example
 See example projec: [examples/MyHotel](https://github.com/StefH/GraphQL.EntityFrameworkCore.DynamicLinq/tree/master/examples/MyHotel) for more details.
