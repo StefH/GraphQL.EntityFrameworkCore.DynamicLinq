@@ -106,7 +106,7 @@ public class MyHotelQuery : ObjectGraphType
 ```
 
 1. Use the `IQueryArgumentInfoListBuilder` to build all possible arguments based on the fields from the GraphQL type (e.g. `RoomType`)
-2. Optionally exclude some properties which should not be searchable
+2. Optionally include/exclude some properties which should not be searchable (this can also be a wildcard like `*Id`)
 3. Optionally add support for OrderBy (argument-name will be `OrderBy`)
 4. Optionally add support for Paging (argument-names will be `Page` and `PageSize`)
 5. Call the `.ToQueryArguments()` to create a new `QueryArguments` object.

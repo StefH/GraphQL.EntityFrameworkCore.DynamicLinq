@@ -16,21 +16,20 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
     public class QueryArgumentInfoListBuilderTests
     {
         private readonly QueryArgumentInfoListBuilderOptions _options = new QueryArgumentInfoListBuilderOptions();
-        private readonly Mock<IOptions<QueryArgumentInfoListBuilderOptions>> _optionsMock;
         private readonly Mock<IPropertyPathResolver> _propertyPathResolverMock;
 
         private readonly QueryArgumentInfoListBuilder _sut;
 
         public QueryArgumentInfoListBuilderTests()
         {
-            _optionsMock = new Mock<IOptions<QueryArgumentInfoListBuilderOptions>>();
-            _optionsMock.Setup(o => o.Value).Returns(_options);
+            var optionsMock = new Mock<IOptions<QueryArgumentInfoListBuilderOptions>>();
+            optionsMock.Setup(o => o.Value).Returns(_options);
 
             _propertyPathResolverMock = new Mock<IPropertyPathResolver>();
             _propertyPathResolverMock.Setup(pr => pr.Resolve(It.IsAny<Type>(), It.IsAny<string>(), It.IsAny<Type>()))
                 .Returns((Type sourceType, string sourcePath, Type destinationType) => sourcePath);
 
-            _sut = new QueryArgumentInfoListBuilder(_optionsMock.Object, _propertyPathResolverMock.Object);
+            _sut = new QueryArgumentInfoListBuilder(optionsMock.Object, _propertyPathResolverMock.Object);
         }
 
         [Fact]

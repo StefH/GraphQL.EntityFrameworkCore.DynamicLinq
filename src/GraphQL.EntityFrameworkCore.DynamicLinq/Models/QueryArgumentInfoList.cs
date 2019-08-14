@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Constants;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Enums;
+using GraphQL.EntityFrameworkCore.DynamicLinq.Matchers;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Validation;
 using GraphQL.Types;
 using JetBrains.Annotations;
@@ -96,7 +97,9 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
         {
             Guard.HasNoNulls(includedGraphQLPropertyPaths, nameof(includedGraphQLPropertyPaths));
 
-            return new QueryArgumentInfoList(this.Where(q => includedGraphQLPropertyPaths.Contains(q.GraphQLPath)));
+            var matcher = new WildcardMatcher(MatchBehaviour.AcceptOnMatch, includedGraphQLPropertyPaths);
+
+            return new QueryArgumentInfoList(this.Where(q => MatchScores.IsPerfect(matcher.IsMatch(q.GraphQLPath))));
         }
 
         [PublicAPI]
@@ -104,7 +107,9 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
         {
             Guard.HasNoNulls(excludedGraphQLPropertyPaths, nameof(excludedGraphQLPropertyPaths));
 
-            return new QueryArgumentInfoList(this.Where(q => !excludedGraphQLPropertyPaths.Contains(q.GraphQLPath)));
+            var matcher = new WildcardMatcher(MatchBehaviour.RejectOnMatch, excludedGraphQLPropertyPaths);
+
+            return new QueryArgumentInfoList(this.Where(q => MatchScores.IsPerfect(matcher.IsMatch(q.GraphQLPath))));
         }
 
         [PublicAPI]
