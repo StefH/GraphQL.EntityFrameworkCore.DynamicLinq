@@ -109,8 +109,8 @@ public class MyHotelQuery : ObjectGraphType
 2. Optionally exclude some properties which should not be searchable
 3. Optionally add support for OrderBy (argument-name will be `OrderBy`)
 4. Optionally add support for Paging (argument-names will be `Page` and `PageSize`)
-5. Call the `.ToQueryArguments()` to craete a new `QueryArguments`.
-6. Call the `ApplyQueryArguments` extension method to apply the seacrh criteria and optionally the OrderBy
+5. Call the `.ToQueryArguments()` to create a new `QueryArguments` object.
+6. Call the `ApplyQueryArguments` extension method to apply the seacrh criteria (optionally the OrderBy and Paging)
 
 ### Example
 See example projec: [examples/MyHotel](https://github.com/StefH/GraphQL.EntityFrameworkCore.DynamicLinq/tree/master/examples/MyHotel) for more details.
