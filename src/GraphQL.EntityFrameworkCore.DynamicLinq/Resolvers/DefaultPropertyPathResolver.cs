@@ -9,7 +9,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Resolvers
     internal class DefaultPropertyPathResolver : IPropertyPathResolver
     {
         /// <inheritdoc cref="IPropertyPathResolver.Resolve(Type, string, Type)" />
-        public string Resolve(Type sourceType, string sourcePropertyPath, Type destinationType)
+        public string Resolve(Type sourceType, string sourcePropertyPath, Type? destinationType)
         {
             return sourcePropertyPath;
         }

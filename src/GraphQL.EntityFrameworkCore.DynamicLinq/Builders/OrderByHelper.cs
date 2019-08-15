@@ -30,7 +30,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
 
         public IQueryable<T> ApplyOrderBy(IQueryable<T> queryable)
         {
-            if (_list.HasOrderBy && TryGetOrderBy(out string? orderByStatement))
+            if (_list.HasOrderBy && TryGetOrderBy(out string orderByStatement))
             {
                 var orderByItems = new List<(string value, QueryArgumentInfoType type, int index)>();
                 ApplyOrderBy(orderByItems, orderByStatement);
@@ -50,11 +50,11 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
             return queryable;
         }
 
-        private bool TryGetOrderBy(out string? orderByStatement)
+        private bool TryGetOrderBy(out string orderByStatement)
         {
             if (!_arguments.TryGetValue(FieldNames.OrderByFieldName, out object value))
             {
-                orderByStatement = null;
+                orderByStatement = string.Empty;
                 return false;
             }
 
@@ -67,7 +67,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
             return true;
         }
 
-        private void ApplyOrderBy(ICollection<(string? value, QueryArgumentInfoType type, int index)> orderByItems, string orderByStatement)
+        private void ApplyOrderBy(ICollection<(string value, QueryArgumentInfoType type, int index)> orderByItems, string orderByStatement)
         {
             int index = 0;
             foreach (Match match in _orderByRegularExpression.Matches(orderByStatement))
@@ -88,6 +88,11 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                     if (queryArgumentInfo == null)
                     {
                         throw new ArgumentException($"The \"{QueryArgumentInfoType.OrderBy}\" field uses an unknown field \"{match.Value}\".");
+                    }
+
+                    if (queryArgumentInfo.EntityPath == null)
+                    {
+                        throw new ArgumentException($"The \"EntityPath\" for field \"{match.Value}\" is null.");
                     }
 
                     orderByItems.Add((queryArgumentInfo.EntityPath, QueryArgumentInfoType.GraphQL, index));
