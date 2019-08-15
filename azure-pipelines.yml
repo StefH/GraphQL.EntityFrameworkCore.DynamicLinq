@@ -12,7 +12,6 @@ steps:
     echo "BuildId = $(buildId)"
   displayName: 'Print buildId'
 
-steps:
 - task: DotNetCoreInstaller@0
  inputs:
  version: '2.2.0'
