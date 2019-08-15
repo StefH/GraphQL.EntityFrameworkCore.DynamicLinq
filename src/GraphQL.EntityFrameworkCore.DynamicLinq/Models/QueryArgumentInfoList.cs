@@ -45,7 +45,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
         }
 
         [PublicAPI]
-        public QueryArgumentInfoList SupportOrderBy([CanBeNull] string orderByArgumentName = null)
+        public QueryArgumentInfoList SupportOrderBy([CanBeNull] string? orderByArgumentName = null)
         {
             if (!HasOrderBy)
             {
@@ -64,7 +64,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
         }
 
         [PublicAPI]
-        public QueryArgumentInfoList SupportPaging([CanBeNull] string pageArgumentName = null, [CanBeNull] string pageSizeArgumentName = null)
+        public QueryArgumentInfoList SupportPaging([CanBeNull] string? pageArgumentName = null, [CanBeNull] string? pageSizeArgumentName = null)
         {
             if (!HasPaging)
             {
@@ -110,14 +110,6 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
             var matcher = new WildcardMatcher(MatchBehaviour.RejectOnMatch, excludedGraphQLPropertyPaths);
 
             return new QueryArgumentInfoList(this.Where(q => MatchScores.IsPerfect(matcher.IsMatch(q.GraphQLPath))));
-        }
-
-        [PublicAPI]
-        public QueryArgumentInfoList Filter([NotNull] Predicate<string> predicate)
-        {
-            Guard.NotNull(predicate, nameof(predicate));
-
-            return new QueryArgumentInfoList(this.Where(q => predicate(q.GraphQLPath)));
         }
     }
 }
