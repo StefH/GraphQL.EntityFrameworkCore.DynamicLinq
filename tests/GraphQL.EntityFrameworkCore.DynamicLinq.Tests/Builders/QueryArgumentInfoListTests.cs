@@ -128,27 +128,5 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             list.Count.Should().Be(1);
             list[0].Should().Be(infoX);
         }
-
-        [Fact]
-        public void Include_WithCustomArgumentName_AddOrderByQueryArgumentInfo()
-        {
-            // Arrange
-            var infoId = new QueryArgumentInfo
-            {
-                QueryArgumentInfoType = QueryArgumentInfoType.GraphQL,
-                QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "Id" },
-                IsNonNullGraphType = true,
-                GraphQLPath = "Id",
-                EntityPath = "Id"
-            };
-            _sut.Add(infoId);
-
-            // Act
-            var list = _sut.Filter(graphQLPath => graphQLPath == "Id");
-
-            // Assert
-            list.Count.Should().Be(1);
-            list[0].Should().Be(infoId);
-        }
     }
 }
