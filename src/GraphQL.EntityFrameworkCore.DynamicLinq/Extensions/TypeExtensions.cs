@@ -27,7 +27,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Extensions
 
         public static Type ModelType(this Type type)
         {
-            return type?.GraphType().GetTypeInfo().BaseType?.GetGenericArguments().First();
+            return type.GraphType().GetTypeInfo().BaseType.GetGenericArguments().First();
         }
 
 #if NET451
