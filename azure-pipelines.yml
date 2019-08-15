@@ -13,8 +13,8 @@ steps:
   displayName: 'Print buildId'
 
 - task: DotNetCoreInstaller@0
- inputs:
- version: '2.2.0'
+  inputs:
+    version: '2.2.0'
 
 # Build source, tests and run tests for netcoreapp2.2 (with coverage)
 - script: |
