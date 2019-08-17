@@ -12,6 +12,8 @@ using JetBrains.Annotations;
 namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
 {
     internal class DynamicQueryableBuilder<T, TGraphQL>
+        where T : notnull
+        where TGraphQL : notnull
     {
         private readonly IQueryable<T> _queryable;
         private readonly QueryArgumentInfoList _list;
