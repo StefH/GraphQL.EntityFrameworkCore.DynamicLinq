@@ -10,7 +10,7 @@ using GraphQL.EntityFrameworkCore.DynamicLinq.Models;
 
 namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
 {
-    internal class OrderByHelper<T>
+    internal class OrderByHelper<T> where T : notnull
     {
         private static string SortOrderAsc = "asc";
         private static string SortOrderDesc = "desc";
@@ -39,7 +39,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
             if (orderByStatement != null)
             {
                 var orderByItems = new List<(string value, QueryArgumentInfoType type, int index)>();
-                ApplyOrderBy(orderByItems, orderByStatement);
+                AddOrderByToList(orderByItems, orderByStatement);
 
                 if (orderByItems.Any())
                 {
@@ -72,7 +72,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
             return orderByStatement;
         }
 
-        private void ApplyOrderBy(ICollection<(string value, QueryArgumentInfoType type, int index)> orderByItems, string orderByStatement)
+        private void AddOrderByToList(ICollection<(string value, QueryArgumentInfoType type, int index)> orderByItems, string orderByStatement)
         {
             int index = 0;
             foreach (Match match in _orderByRegularExpression.Matches(orderByStatement))
