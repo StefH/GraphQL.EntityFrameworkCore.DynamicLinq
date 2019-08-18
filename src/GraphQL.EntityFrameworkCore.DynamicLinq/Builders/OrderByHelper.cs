@@ -10,7 +10,7 @@ using GraphQL.EntityFrameworkCore.DynamicLinq.Models;
 
 namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
 {
-    internal class OrderByHelper<T> where T : notnull
+    internal class OrderByHelper<T>
     {
         private static string SortOrderAsc = "asc";
         private static string SortOrderDesc = "desc";
