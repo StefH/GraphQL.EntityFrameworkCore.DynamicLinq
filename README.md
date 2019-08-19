@@ -106,7 +106,7 @@ public class MyHotelQuery : ObjectGraphType
 1       var roomQueryArgumentList = builder.Build<RoomType>()
 2           .Exclude("Id")
 3           .SupportOrderBy()
-4           .Supportpaging();
+4           .SupportPaging();
 
         Field<ListGraphType<RoomType>>("rooms",
 5           arguments: roomQueryArgumentList.ToQueryArguments(),
