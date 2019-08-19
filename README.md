@@ -60,11 +60,25 @@ query {
 ```
 
 #### OrderBy `name`
-It's even possible to add support for an **OrderBy** field, just add the `.SupportOrderBy();` in the code.
+It's also possible to add support for an **OrderBy** field, just add the `.SupportOrderBy();` in the code.
 
 ``` js
 query {
   rooms (orderBy: "name desc") {
+    name
+    number
+    status
+  }
+}
+```
+
+#### Paging
+It's also possible to add support for **Paging**, just add the `.SupportPaging();` in the code.
+
+``` js
+query {
+  roomsWithPaging (page: 1, pageSize: 2) {
+    id
     name
     number
     status
@@ -92,7 +106,7 @@ public class MyHotelQuery : ObjectGraphType
 1       var roomQueryArgumentList = builder.Build<RoomType>()
 2           .Exclude("Id")
 3           .SupportOrderBy()
-4           .Supportpaging();
+4           .SupportPaging();
 
         Field<ListGraphType<RoomType>>("rooms",
 5           arguments: roomQueryArgumentList.ToQueryArguments(),
@@ -110,7 +124,7 @@ public class MyHotelQuery : ObjectGraphType
 3. Optionally add support for OrderBy (argument-name will be `OrderBy`)
 4. Optionally add support for Paging (argument-names will be `Page` and `PageSize`)
 5. Call the `.ToQueryArguments()` to create a new `QueryArguments` object.
-6. Call the `ApplyQueryArguments` extension method to apply the seacrh criteria (optionally the OrderBy and Paging)
+6. Call the `ApplyQueryArguments` extension method to apply the search criteria (optionally the OrderBy and Paging)
 
 ### Example
 See example projec: [examples/MyHotel](https://github.com/StefH/GraphQL.EntityFrameworkCore.DynamicLinq/tree/master/examples/MyHotel) for more details.

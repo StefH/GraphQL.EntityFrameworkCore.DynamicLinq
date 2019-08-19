@@ -66,18 +66,34 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
 
         private IQueryable<T> ApplyWhere(IQueryable<T> queryable)
         {
-            var predicates = (from queryArgumentInfo in _list.FilterBy(QueryArgumentInfoType.GraphQL)
-                              from argument in _arguments
-                              where string.Equals(queryArgumentInfo.QueryArgument.Name, argument.Key, StringComparison.OrdinalIgnoreCase)
-                              select BuildPredicate(queryArgumentInfo, argument.Value)).ToArray();
+            var predicates = new List<string>();
+            foreach (var queryArgumentInfo in _list.FilterBy(QueryArgumentInfoType.GraphQL))
+            {
+                foreach (var argument in _arguments)
+                {
+                    if (string.Equals(argument.Key, queryArgumentInfo.QueryArgument?.Name, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var predicate = BuildPredicate(queryArgumentInfo, argument.Value);
+                        if (predicate != null)
+                        {
+                            predicates.Add(predicate);
+                        }
+                    }
+                }
+            }
 
             return predicates.Any() ? queryable.Where(string.Join($" {Operators.And} ", predicates)) : queryable;
         }
 
-        private string BuildPredicate(QueryArgumentInfo info, object value)
+        private string? BuildPredicate(QueryArgumentInfo info, object value)
         {
+            if (info.EntityPath == null)
+            {
+                return null;
+            }
+
             var predicates = new List<(string propertyPath, string @operator, object propertyValue)>();
-            if (info.QueryArgument.Type == typeof(DateGraphType) && value is DateTime date)
+            if (info?.QueryArgument?.Type == typeof(DateGraphType) && value is DateTime date)
             {
                 predicates.Add((info.EntityPath, Operators.GreaterThanEqual, date));
                 predicates.Add((info.EntityPath, Operators.LessThan, date.AddDays(1)));

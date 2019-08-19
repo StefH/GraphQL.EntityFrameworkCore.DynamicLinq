@@ -30,10 +30,16 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
 
         public IQueryable<T> ApplyOrderBy(IQueryable<T> queryable)
         {
-            if (_list.HasOrderBy && TryGetOrderBy(out string orderByStatement))
+            if (!_list.HasOrderBy)
+            {
+                return queryable;
+            }
+
+            var orderByStatement = TryGetOrderBy();
+            if (orderByStatement != null)
             {
                 var orderByItems = new List<(string value, QueryArgumentInfoType type, int index)>();
-                ApplyOrderBy(orderByItems, orderByStatement);
+                AddOrderByToList(orderByItems, orderByStatement);
 
                 if (orderByItems.Any())
                 {
@@ -50,24 +56,23 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
             return queryable;
         }
 
-        private bool TryGetOrderBy(out string orderByStatement)
+        private string? TryGetOrderBy()
         {
             if (!_arguments.TryGetValue(FieldNames.OrderByFieldName, out object value))
             {
-                orderByStatement = null;
-                return false;
+                return null;
             }
 
-            orderByStatement = Convert.ToString(value);
+            string orderByStatement = Convert.ToString(value);
             if (string.IsNullOrWhiteSpace(orderByStatement))
             {
                 throw new ArgumentException($"The \"{FieldNames.OrderByFieldName}\" field is empty.");
             }
 
-            return true;
+            return orderByStatement;
         }
 
-        private void ApplyOrderBy(ICollection<(string value, QueryArgumentInfoType type, int index)> orderByItems, string orderByStatement)
+        private void AddOrderByToList(ICollection<(string value, QueryArgumentInfoType type, int index)> orderByItems, string orderByStatement)
         {
             int index = 0;
             foreach (Match match in _orderByRegularExpression.Matches(orderByStatement))
@@ -88,6 +93,11 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                     if (queryArgumentInfo == null)
                     {
                         throw new ArgumentException($"The \"{QueryArgumentInfoType.OrderBy}\" field uses an unknown field \"{match.Value}\".");
+                    }
+
+                    if (queryArgumentInfo.EntityPath == null)
+                    {
+                        throw new ArgumentException($"The \"EntityPath\" for field \"{match.Value}\" is null.");
                     }
 
                     orderByItems.Add((queryArgumentInfo.EntityPath, QueryArgumentInfoType.GraphQL, index));

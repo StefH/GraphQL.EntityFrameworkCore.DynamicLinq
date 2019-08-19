@@ -12,6 +12,6 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Resolvers
         /// <param name="sourceType">Type of the source.</param>
         /// <param name="sourcePropertyPath">The source property path.</param>
         /// <param name="destinationType">Type of the destination (optional).</param>
-        string Resolve([NotNull] Type sourceType, [NotNull] string sourcePropertyPath, [CanBeNull] Type destinationType = null);
+        string Resolve([NotNull] Type sourceType, [NotNull] string sourcePropertyPath, [CanBeNull] Type? destinationType = null);
     }
 }

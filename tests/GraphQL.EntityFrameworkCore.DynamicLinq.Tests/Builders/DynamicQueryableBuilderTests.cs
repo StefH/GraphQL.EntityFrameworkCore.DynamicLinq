@@ -282,5 +282,38 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             _context.Errors.Count.Should().Be(1);
             _context.Errors[0].Message.Should().Be("The \"OrderBy\" field with value \"asc\" cannot be used without a query field.");
         }
+
+        [Fact]
+        public void Build_When_OrderByHasNullEntityPath_AddsError()
+        {
+            // Arrange
+            var queryable = Enumerable.Empty<Reservation>().AsQueryable();
+            var list = new QueryArgumentInfoList
+            {
+                new QueryArgumentInfo
+                {
+                    QueryArgumentInfoType = QueryArgumentInfoType.OrderBy,
+                    QueryArgument = new QueryArgument(typeof(StringGraphType)) { Name = "OrderBy" }
+                },
+                new QueryArgumentInfo
+                {
+                    QueryArgumentInfoType = QueryArgumentInfoType.GraphQL,
+                    QueryArgument = new QueryArgument(typeof(DateGraphType)) { Name = "CheckinDate" },
+                    IsNonNullGraphType = true,
+                    GraphQLPath = "CheckinDate",
+                    EntityPath = null
+                }
+            };
+            _context.Arguments.Add("orderBy", "CheckinDate");
+
+            var builder = new DynamicQueryableBuilder<Reservation, object>(queryable, list, _context);
+
+            // Act
+            var result = builder.Build();
+
+            // Assert
+            _context.Errors.Count.Should().Be(1);
+            _context.Errors[0].Message.Should().Be("The \"EntityPath\" for field \"CheckinDate\" is null.");
+        }
     }
 }
