@@ -1,3 +1,5 @@
+# 1.0.0 (07 September 2019)
+
 # 0.0.2 (19 August 2019)
 - [#2](https://github.com/StefH/GraphQL.EntityFrameworkCore.DynamicLinq/pull/2) - Paging [enhancement] contributed by [StefH](https://github.com/StefH)
 - [#3](https://github.com/StefH/GraphQL.EntityFrameworkCore.DynamicLinq/pull/3) - C# Nullable Reference Types [enhancement] contributed by [StefH](https://github.com/StefH)

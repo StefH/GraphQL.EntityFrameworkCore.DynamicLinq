@@ -16,11 +16,11 @@
     <DefaultLanguage>en-us</DefaultLanguage>
     <ProjectGuid>{003C2B77-F413-4882-B904-2686C968392D}</ProjectGuid>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <!--<AssemblyOriginatorKeyFile>EntityFramework.DynamicLinq.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>-->
     <LangVersion>8.0</LangVersion>
     <Nullable>enable</Nullable>
+    <!--<SignAssembly>true</SignAssembly>-->
+    <!--<AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>-->
+    <!--<PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>-->
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -32,7 +32,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="GraphQL" Version="2.4.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.DynamicLinq" Version="1.0.18" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.DynamicLinq" Version="1.0.19" />
   </ItemGroup>
 
 </Project>
