@@ -4,14 +4,14 @@
     <AssemblyTitle>GraphQL.EntityFrameworkCore.DynamicLinq</AssemblyTitle>
     <Title>GraphQL.EntityFrameworkCore.DynamicLinq</Title>
     <Description>GraphQL EntityFrameworkCore Dynamic Linq extensions to query GraphQL types dynamically</Description>
-    <PackageTags>GraphQL;entityframework;core;dynamiclinq</PackageTags>
+    <PackageTags>GraphQL;ef;efcore;entityframework;core;entityframeworkcore;dynamiclinq;dynamic;linq</PackageTags>
     <TargetFrameworks>netstandard1.3;netstandard2.0;net451</TargetFrameworks>
     <Authors>Stef Heyenrath</Authors>
     <Copyright>Stef Heyenrath</Copyright>
     <PackageReleaseNotes>See CHANGELOG.md</PackageReleaseNotes>
-    <PackageProjectUrl>https://github.com/StefH/System.Linq.Dynamic.Core</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/StefH/System.Linq.Dynamic.Core</RepositoryUrl>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/StefH/System.Linq.Dynamic.Core/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/StefH/GraphQL.EntityFrameworkCore.DynamicLinq</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/StefH/GraphQL.EntityFrameworkCore.DynamicLinq</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
     <DefaultLanguage>en-us</DefaultLanguage>
     <ProjectGuid>{003C2B77-F413-4882-B904-2686C968392D}</ProjectGuid>
