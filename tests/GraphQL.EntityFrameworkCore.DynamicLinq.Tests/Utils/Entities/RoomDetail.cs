@@ -12,16 +12,5 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Utils.Entities
         public int Windows { get; set; }
 
         public int Beds  { get; set; }
-
-        public RoomDetail()
-        {
-            
-        }
-
-        public RoomDetail(int windows, int beds)
-        {
-            Windows = windows;
-            Beds = beds;
-        }
     }
 }

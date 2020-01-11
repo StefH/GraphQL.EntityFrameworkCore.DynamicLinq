@@ -43,6 +43,28 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
         }
 
         [Fact]
+        public void Build_With_ListGraphType_ReturnsCorrectQueryArgumentInfoList()
+        {
+            // Arrange
+
+            // Act
+            var list = _sut.Build<BuildingType>();
+
+            // Assert
+            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(3);
+            list.Select(q => q.GraphQLPath).Should().BeEquivalentTo(
+                "Rooms",
+                "Id",
+                "Name"
+            );
+            list.Select(q => q.EntityPath).Should().BeEquivalentTo(
+                "Rooms",
+                "Id",
+                "Name"
+            );
+        }
+
+        [Fact]
         public void Build_With_GraphType_ReturnsCorrectQueryArgumentInfoList()
         {
             // Arrange

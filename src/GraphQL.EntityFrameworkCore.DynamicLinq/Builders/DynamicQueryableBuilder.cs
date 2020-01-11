@@ -93,7 +93,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
             }
 
             var predicates = new List<(string propertyPath, string @operator, object propertyValue)>();
-            if (info?.QueryArgument?.Type == typeof(DateGraphType) && value is DateTime date)
+            if (info.QueryArgument?.Type == typeof(DateGraphType) && value is DateTime date)
             {
                 predicates.Add((info.EntityPath, Operators.GreaterThanEqual, date));
                 predicates.Add((info.EntityPath, Operators.LessThan, date.AddDays(1)));

@@ -87,7 +87,7 @@ namespace GraphQL.Api
             var customerArguments = builder.Build<CustomerGraph>().SupportOrderBy();
             Field<ListGraphType<CustomerGraph>>("customers",
                 arguments: customerArguments.ToQueryArguments(),
-                resolve: context => dbcontext.Customers.ApplyQueryArguments(customerArguments, context)
+                resolve: context => dbcontext.Customers.Include(c => c.Orders).ApplyQueryArguments(customerArguments, context)
             );
 
             var orderArguments = builder.Build<OrderGraph>().SupportOrderBy();
