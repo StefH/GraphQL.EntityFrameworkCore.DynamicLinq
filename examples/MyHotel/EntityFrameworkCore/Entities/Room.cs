@@ -24,9 +24,13 @@ namespace MyHotel.EntityFrameworkCore.Entities
 
         public int? RoomDetailId { get; set; }
 
+        public int? BuildingId { get; set; }
+
+        public Building Building { get; set; }
+
         public Room()
         {
-            
+
         }
 
         public Room(int number, string name, RoomStatus status, bool allowedSmoking, int roomDetailId)

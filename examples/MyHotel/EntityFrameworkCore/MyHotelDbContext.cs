@@ -20,8 +20,14 @@ namespace MyHotel.EntityFrameworkCore
 
         public DbSet<RoomDetail> RoomDetails { get; set; }
 
+        public DbSet<Building> Buildings { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // BUILDINGS
+            modelBuilder.Entity<Building>().HasData(new Building { Id = 1, Name = "A" });
+            modelBuilder.Entity<Building>().HasData(new Building { Id = 1, Name = "B" });
+
             //GUESTS
             modelBuilder.Entity<Guest>().HasData(new Guest("Alper Ebicoglu", DateTime.Now.AddDays(-10)) { Id = 1 });
             modelBuilder.Entity<Guest>().HasData(new Guest("George Michael", DateTime.Now.AddDays(-5)) { Id = 2 });
@@ -34,14 +40,15 @@ namespace MyHotel.EntityFrameworkCore
             modelBuilder.Entity<RoomDetail>().HasData(new RoomDetail(0, 2) { Id = 103 });
 
             //ROOMS
-            modelBuilder.Entity<Room>().HasData(new Room(101, "yellow-room", RoomStatus.Available, false, 100) { Id = 1 });
-            modelBuilder.Entity<Room>().HasData(new Room(102, "blue-room", RoomStatus.Available, false, 101) { Id = 2 });
-            modelBuilder.Entity<Room>().HasData(new Room(103, "white-room", RoomStatus.Unavailable, false, 102) { Id = 3 });
-            modelBuilder.Entity<Room>().HasData(new Room(104, "black-room", RoomStatus.Unavailable, false, 103) { Id = 4 });
+            modelBuilder.Entity<Room>().HasData(new Room(101, "yellow-room", RoomStatus.Available, false, 100) { Id = 1, BuildingId = 1 });
+            modelBuilder.Entity<Room>().HasData(new Room(102, "blue-room", RoomStatus.Available, false, 101) { Id = 2, BuildingId = 1 });
+            modelBuilder.Entity<Room>().HasData(new Room(103, "white-room", RoomStatus.Unavailable, false, 102) { Id = 3, BuildingId = 2 });
+            modelBuilder.Entity<Room>().HasData(new Room(104, "black-room", RoomStatus.Unavailable, false, 103) { Id = 4, BuildingId = 2 });
 
             //RESERVATIONS
             modelBuilder.Entity<Reservation>().HasData(new Reservation(DateTime.Now.AddDays(-2), DateTime.Now.AddDays(3), 3, 1) { Id = 1 });
             modelBuilder.Entity<Reservation>().HasData(new Reservation(DateTime.Now.AddDays(-1), DateTime.Now.AddDays(4), 4, 2) { Id = 2 });
+
 
             base.OnModelCreating(modelBuilder);
         }
