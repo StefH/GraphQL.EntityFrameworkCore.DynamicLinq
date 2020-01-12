@@ -26,6 +26,10 @@ query {
       beds
       windows
     }
+    building {
+      id
+      name
+    }
   }
 }
 

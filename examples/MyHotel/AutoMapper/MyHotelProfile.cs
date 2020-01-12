@@ -24,6 +24,8 @@ namespace MyHotel.AutoMapper
                 .ForMember(m => m.Beds, opt => opt.MapFrom(e => e.RoomDetail.Beds))
                 .ForMember(m => m.Windows, opt => opt.MapFrom(e => e.RoomDetail.Windows))
             ;
+
+            CreateMap<Building, BuildingModel>();
         }
     }
 }

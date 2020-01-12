@@ -15,5 +15,7 @@ namespace MyHotel.Models
         public bool AllowedSmoking { get; set; }
 
         public RoomDetailModel Detail { get; set; }
+
+        public BuildingModel Building { get; set; }
     }
 }

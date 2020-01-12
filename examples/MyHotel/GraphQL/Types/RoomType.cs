@@ -13,6 +13,7 @@ namespace MyHotel.GraphQL.Types
             Field(x => x.AllowedSmoking);
             Field<RoomStatusType>(nameof(RoomModel.Status));
             Field<RoomDetailType>(nameof(RoomModel.Detail));
+            Field<BuildingType>(nameof(RoomModel.Building));
         }
     }
 }
