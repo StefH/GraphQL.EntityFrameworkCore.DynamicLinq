@@ -1,0 +1,79 @@
+query {
+  reservations(roomAllowedSmoking: false, roomDetailBeds: 2) {
+    checkinDate
+    guest {
+      name
+    }
+    room {
+      name
+      number
+      status
+      detail {
+        beds
+        windows
+      }
+    }
+  }
+}
+
+query {
+  rooms {
+    id
+    name
+    number
+    status
+    detail {
+      beds
+      windows
+    }
+    building {
+      id
+      name
+    }
+  }
+}
+
+query {
+  rooms (detailBeds: 2) {
+    name
+    number
+    status
+    detail {
+      identifier
+      beds
+      windows
+    }
+  }
+}
+
+query {
+  roomsWithPaging (page: 1, pageSize: 2) {
+    id
+    name
+    number
+    status
+    detail {
+      beds
+      windows
+    }
+  }
+}
+
+query {
+  flatrooms(beds: 2) {
+    name
+    number
+    status
+    beds
+    windows
+  }
+}
+
+query {
+  guests (orderBy: "name desc"){
+    id
+    name
+    nullableInt
+    registerDate
+  }
+}
