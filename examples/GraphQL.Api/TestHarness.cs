@@ -22,16 +22,25 @@ namespace GraphQL.Api
         public Customer Customer { get; set; }
     }
 
-    public class CustomerGraph : ObjectGraphType<Customer>
+public class CustomerGraph : ObjectGraphType<Customer>
+{
+    public CustomerGraph()
     {
-        public CustomerGraph()
-        {
-            Name = "Customer";
-            Field(x => x.CustomerID);
-            Field(x => x.CustomerName);
-            Field<ListGraphType<OrderGraph>>("Orders", resolve: context => context.Source.Orders);
-        }
+        Name = "Customer";
+        Field(x => x.CustomerID);
+        Field(x => x.CustomerName);
+
+        //Field<List<OrderGraph>, ICollection<Order>>()
+        //    .Name("Orders")
+        //    .Resolve(r => r.Source.Orders);
+
+        //Field(typeof(ListGraphType<OrderGraph>), "Orders", "The orders", resolve: context => context.Source.Orders);
+        Field<ListGraphType<OrderGraph>>("Orders", resolve: context => context.Source.Orders);
+        //Field<ListGraphType<StringGraphType>>("Orders");
+
+        //AddField(new FieldType { Name = "Orders", ResolvedType = typeof(typeof(ListGraphType<OrderGraph>) });
     }
+}
 
     public class OrderGraph : ObjectGraphType<Order>
     {

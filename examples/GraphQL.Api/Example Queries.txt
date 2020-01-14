@@ -1,0 +1,7 @@
+query {
+  customers {
+    orders {
+      orderId
+    }
+  }
+}

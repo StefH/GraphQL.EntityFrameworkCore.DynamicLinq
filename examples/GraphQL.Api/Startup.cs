@@ -2,6 +2,7 @@ using GraphQL.EntityFrameworkCore.DynamicLinq.DependencyInjection;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Options;
 using GraphQL.Server;
 using GraphQL.Server.Ui.Playground;
+using GraphQL.Types;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -29,7 +30,6 @@ namespace GraphQL.Api
             {
                 options.UseSqlServer(Configuration.GetConnectionString("LeaseWebDB"));
             });
-
 
             RegisterGraphQL(services);
         }
@@ -60,12 +60,17 @@ namespace GraphQL.Api
             services.AddScoped<IDependencyResolver>(provider => new FuncDependencyResolver(provider.GetRequiredService));
             services.Configure<QueryArgumentInfoListBuilderOptions>(Configuration.GetSection("QueryArgumentInfoListBuilderOptions"));
             services.AddScoped<SchemaTest>();
+            
             services.AddGraphQL(o =>
             {
                 o.EnableMetrics = true;
                 o.ExposeExceptions = true;
             })
-                .AddGraphTypes(ServiceLifetime.Scoped);
+            .AddGraphTypes(ServiceLifetime.Scoped);
+
+            services.AddScoped<IGraphType, ListGraphType2<OrderGraph>>();
+
+
             services.AddGraphQLEntityFrameworkCoreDynamicLinq();
         }
     }
