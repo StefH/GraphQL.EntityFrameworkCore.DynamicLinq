@@ -48,7 +48,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                 return list;
             }
 
-            complexGraphQLInstance.Fields.ToList().ForEach(ft =>
+            foreach (var ft in complexGraphQLInstance.Fields)
             {
                 string graphPath = $"{parentGraphQLPath}{ft.Name}";
 
@@ -62,6 +62,11 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                 {
                     list.AddRange(PopulateQueryArgumentInfoList(childGraphQLType, graphPath, entityPath, level + 1));
                 }
+                else if (childGraphQLType.IsListGraphType())
+                {
+                    // var genericType = childGraphQLType.GenericTypeArguments.First();
+                    // list.AddRange(PopulateQueryArgumentInfoList(genericType, graphPath, entityPath, level + 1));
+                }
                 else
                 {
                     list.Add(new QueryArgumentInfo
@@ -73,7 +78,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                         QueryArgumentInfoType = QueryArgumentInfoType.GraphQL
                     });
                 }
-            });
+            }
 
             return list;
         }

@@ -25,6 +25,12 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Extensions
             return baseType != null && baseType.Name == "ObjectGraphType`1";
         }
 
+        public static bool IsListGraphType(this Type type)
+        {
+            Type baseType = type.GetTypeInfo().BaseType;
+            return baseType != null && baseType == typeof(ListGraphType);
+        }
+
         public static Type ModelType(this Type type)
         {
             return type.GraphType().GetTypeInfo().BaseType.GetGenericArguments().First();
