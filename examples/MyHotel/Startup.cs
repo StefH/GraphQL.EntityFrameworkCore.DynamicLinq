@@ -7,7 +7,6 @@ using GraphQL.EntityFrameworkCore.DynamicLinq.Options;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Resolvers;
 using GraphQL.Server;
 using GraphQL.Server.Ui.Playground;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;

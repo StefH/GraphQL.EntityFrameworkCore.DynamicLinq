@@ -23,18 +23,5 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Utils.Entities
         public DateTime CheckinDate { get; set; }
 
         public DateTime CheckoutDate { get; set; }
-
-        public Reservation()
-        {
-
-        }
-
-        public Reservation(DateTime checkinDate, DateTime checkoutDate, int roomId, int guestId)
-        {
-            CheckinDate = checkinDate;
-            CheckoutDate = checkoutDate;
-            RoomId = roomId;
-            GuestId = guestId;
-        }
     }
 }

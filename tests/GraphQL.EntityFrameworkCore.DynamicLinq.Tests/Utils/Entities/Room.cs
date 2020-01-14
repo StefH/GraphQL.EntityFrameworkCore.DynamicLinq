@@ -26,18 +26,9 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Utils.Entities
 
         public int? RoomDetailId { get; set; }
 
-        public Room()
-        {
-            
-        }
+        [ForeignKey("RoomDetailId")]
+        public Building Building { get; set; }
 
-        public Room(int number, string name, RoomStatus status, bool allowedSmoking, int roomDetailId)
-        {
-            Number = number;
-            Name = name;
-            Status = status;
-            AllowedSmoking = allowedSmoking;
-            RoomDetailId = roomDetailId;
-        }
+        public int? BuildingId { get; set; }
     }
 }
