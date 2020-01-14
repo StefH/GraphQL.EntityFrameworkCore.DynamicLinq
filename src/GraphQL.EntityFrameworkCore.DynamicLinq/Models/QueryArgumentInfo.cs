@@ -5,6 +5,8 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
 {
     public class QueryArgumentInfo
     {
+        public bool ParentGraphTypeIsCollection { get; internal set; }
+
         public QueryArgumentInfoType QueryArgumentInfoType { get; internal set; }
 
         public QueryArgument? QueryArgument { get; internal set; }

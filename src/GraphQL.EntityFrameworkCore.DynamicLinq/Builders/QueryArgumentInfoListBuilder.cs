@@ -37,10 +37,12 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
         {
             Guard.NotNull(graphQLType, nameof(graphQLType));
 
-            return PopulateQueryArgumentInfoList(graphQLType, string.Empty, string.Empty, 0);
+            return PopulateQueryArgumentInfoList(graphQLType, string.Empty, string.Empty, 0, graphQLType.IsListGraphType());
         }
 
-        private QueryArgumentInfoList PopulateQueryArgumentInfoList(Type graphQLType, string parentGraphQLPath, string parentEntityPath, int level)
+        private QueryArgumentInfoList PopulateQueryArgumentInfoList(Type graphQLType,
+            string parentGraphQLPath, string parentEntityPath,
+            int level, bool parentGraphTypeIsCollection)
         {
             var list = new QueryArgumentInfoList();
             if (level > _options.MaxRecursionLevel || !(Activator.CreateInstance(graphQLType) is IComplexGraphType complexGraphQLInstance))
@@ -60,17 +62,18 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                 Type childGraphQLType = ft.Type.GraphType();
                 if (childGraphQLType.IsObjectGraphType())
                 {
-                    list.AddRange(PopulateQueryArgumentInfoList(childGraphQLType, graphPath, entityPath, level + 1));
+                    list.AddRange(PopulateQueryArgumentInfoList(childGraphQLType, graphPath, entityPath, level + 1, parentGraphTypeIsCollection));
                 }
                 else if (childGraphQLType.IsListGraphType())
                 {
-                    // var genericType = childGraphQLType.GenericTypeArguments.First();
-                    // list.AddRange(PopulateQueryArgumentInfoList(genericType, graphPath, entityPath, level + 1));
+                    var genericType = childGraphQLType.GenericTypeArguments.First();
+                    list.AddRange(PopulateQueryArgumentInfoList(genericType, graphPath, entityPath, level + 1, true));
                 }
                 else
                 {
                     list.Add(new QueryArgumentInfo
                     {
+                        ParentGraphTypeIsCollection = parentGraphTypeIsCollection,
                         QueryArgument = new QueryArgument(childGraphQLType) { Name = graphPath },
                         GraphQLPath = graphPath,
                         EntityPath = entityPath,

@@ -92,11 +92,18 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                 return null;
             }
 
+            ScalarGraphType d;
+
             var predicates = new List<(string propertyPath, string @operator, object propertyValue)>();
             if (info.QueryArgument?.Type == typeof(DateGraphType) && value is DateTime date)
             {
                 predicates.Add((info.EntityPath, Operators.GreaterThanEqual, date));
                 predicates.Add((info.EntityPath, Operators.LessThan, date.AddDays(1)));
+            }
+            else if (info.ParentGraphTypeIsCollection)
+            {
+                // Orders.Any()
+                predicates.Add((info.EntityPath, Operators.Equal, value));
             }
             else
             {
