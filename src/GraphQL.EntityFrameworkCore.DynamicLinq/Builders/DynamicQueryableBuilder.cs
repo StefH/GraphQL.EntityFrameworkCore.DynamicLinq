@@ -116,15 +116,15 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
 
             var text = string.Join($" {Operators.And} ", predicates.Select(p =>
             {
-                if (info.ParentGraphType?.IsListGraphType() == false)
+                if (!info.ParentGraphType.IsListGraphType())
                 {
-                    int xxx = 0;
+                    string path = string.Join(".", info.EntityPath);
+                    string wrap = info.IsNonNullGraphType ? path : $"np({path})";
+                    return $"({wrap} {p.@operator} {p.placeHolder})";
                 }
 
-                string path = string.Join(".", info.EntityPath);
-
-                string wrap = info.IsNonNullGraphType ? path : $"np({path})";
-                return $"({wrap} {p.@operator} {p.placeHolder})";
+                var theRest = string.Join(".", info.EntityPath.Skip(1));
+                return $"({info.EntityPath[0]} != null ? {info.EntityPath[0]}.Any({theRest} {p.@operator} {p.placeHolder}) : false)";
             }));
 
             return (text, values.ToArray());

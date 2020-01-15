@@ -19,6 +19,6 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
 
         //public string? EntityPath { get; internal set; }
 
-        public List<string> EntityPath { get; internal set; }
+        public List<string> EntityPath { get; internal set; } = new List<string>();
     }
 }
