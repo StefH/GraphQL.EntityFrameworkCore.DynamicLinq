@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Constants;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Enums;
+using GraphQL.EntityFrameworkCore.DynamicLinq.Extensions;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Models;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Validation;
 using GraphQL.Types;
@@ -67,54 +68,78 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
         private IQueryable<T> ApplyWhere(IQueryable<T> queryable)
         {
             var predicates = new List<string>();
+            var values = new List<object>();
+
+            var counter = new PlaceHolderCounter();
+
             foreach (var queryArgumentInfo in _list.FilterBy(QueryArgumentInfoType.GraphQL))
             {
                 foreach (var argument in _arguments)
                 {
                     if (string.Equals(argument.Key, queryArgumentInfo.QueryArgument?.Name, StringComparison.OrdinalIgnoreCase))
                     {
-                        var predicate = BuildPredicate(queryArgumentInfo, argument.Value);
+                        var predicate = BuildPredicate(queryArgumentInfo, argument.Value, counter);
                         if (predicate != null)
                         {
-                            predicates.Add(predicate);
+                            predicates.Add(predicate.Value.Text);
+                            values.AddRange(predicate.Value.Values);
                         }
                     }
                 }
             }
 
-            return predicates.Any() ? queryable.Where(string.Join($" {Operators.And} ", predicates)) : queryable;
+            return predicates.Any() ? queryable.Where(string.Join($" {Operators.And} ", predicates), values.ToArray()) : queryable;
         }
 
-        private string? BuildPredicate(QueryArgumentInfo info, object value)
+        private (string Text, object[] Values)? BuildPredicate(QueryArgumentInfo info, object value, PlaceHolderCounter counter)
         {
             if (info.EntityPath == null)
             {
                 return null;
             }
 
-            ScalarGraphType d;
-
-            var predicates = new List<(string propertyPath, string @operator, object propertyValue)>();
+            var values = new List<object>();
+            var predicates = new List<(string @operator, string placeHolder)>();
             if (info.QueryArgument?.Type == typeof(DateGraphType) && value is DateTime date)
             {
-                predicates.Add((info.EntityPath, Operators.GreaterThanEqual, date));
-                predicates.Add((info.EntityPath, Operators.LessThan, date.AddDays(1)));
-            }
-            else if (info.ParentGraphTypeIsCollection)
-            {
-                // Orders.Any()
-                predicates.Add((info.EntityPath, Operators.Equal, value));
+                predicates.Add((Operators.GreaterThanEqual, $"@{counter.GetNew()}"));
+                predicates.Add((Operators.LessThan, $"@{counter.GetNew()}"));
+
+                values.Add(date);
+                values.Add(date.AddDays(1));
             }
             else
             {
-                predicates.Add((info.EntityPath, Operators.Equal, value));
+                predicates.Add((Operators.Equal, $"@{counter.GetNew()}"));
+                values.Add(value);
             }
 
-            return string.Join($" {Operators.And} ", predicates.Select(p =>
+            var text = string.Join($" {Operators.And} ", predicates.Select(p =>
             {
-                string wrap = info.IsNonNullGraphType ? p.propertyPath : $"np({p.propertyPath})";
-                return $"({wrap} {p.@operator} \"{p.propertyValue}\")";
+                if (info.ParentGraphType?.IsListGraphType() == false)
+                {
+                    int xxx = 0;
+                }
+
+                string path = string.Join(".", info.EntityPath);
+
+                string wrap = info.IsNonNullGraphType ? path : $"np({path})";
+                return $"({wrap} {p.@operator} {p.placeHolder})";
             }));
+
+            return (text, values.ToArray());
+        }
+    }
+
+    internal class PlaceHolderCounter
+    {
+        private int _value = -1;
+
+        public int GetNew()
+        {
+            _value++;
+
+            return _value;
         }
     }
 }

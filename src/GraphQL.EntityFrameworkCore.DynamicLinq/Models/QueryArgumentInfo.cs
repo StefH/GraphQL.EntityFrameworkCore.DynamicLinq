@@ -1,11 +1,13 @@
-﻿using GraphQL.EntityFrameworkCore.DynamicLinq.Enums;
+﻿using System;
+using System.Collections.Generic;
+using GraphQL.EntityFrameworkCore.DynamicLinq.Enums;
 using GraphQL.Types;
 
 namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
 {
     public class QueryArgumentInfo
     {
-        public bool ParentGraphTypeIsCollection { get; internal set; }
+        public Type? ParentGraphType { get; internal set; }
 
         public QueryArgumentInfoType QueryArgumentInfoType { get; internal set; }
 
@@ -15,6 +17,8 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
 
         public string? GraphQLPath { get; internal set; }
 
-        public string? EntityPath { get; internal set; }
+        //public string? EntityPath { get; internal set; }
+
+        public List<string> EntityPath { get; internal set; }
     }
 }
