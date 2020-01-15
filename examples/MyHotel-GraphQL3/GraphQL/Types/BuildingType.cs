@@ -9,7 +9,7 @@ namespace MyHotel.GraphQL.Types
         {
             Field(x => x.Id);
             Field(x => x.Name);
-            Field<ListGraphType<RoomType>>(nameof(BuildingModel.Rooms));
+            Field<ListGraphType<RoomType>>(nameof(BuildingModel.Rooms), resolve: context => context.Source.Rooms);
         }
     }
 }

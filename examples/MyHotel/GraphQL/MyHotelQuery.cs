@@ -8,6 +8,7 @@ using GraphQL;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Builders;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Extensions;
 using GraphQL.Types;
+using MyHotel.EntityFrameworkCore;
 using MyHotel.EntityFrameworkCore.Entities;
 using MyHotel.GraphQL.Types;
 using MyHotel.Models;
@@ -18,8 +19,17 @@ namespace MyHotel.GraphQL
 {
     public class MyHotelQuery : ObjectGraphType
     {
-        public MyHotelQuery(MyHotelRepository myHotelRepository, IQueryArgumentInfoListBuilder builder, IMapper mapper)
+        public MyHotelQuery(MyHotelRepository myHotelRepository, MyHotelDbContext myHotelDbContext, IQueryArgumentInfoListBuilder builder, IMapper mapper)
         {
+            var buildingsQueryArgumentList = builder.Build<BuildingType>().SupportOrderBy();
+            Field<ListGraphType<BuildingType>>("buildings",
+                arguments: buildingsQueryArgumentList.ToQueryArguments(),
+                resolve: context => myHotelDbContext.Buildings
+                    .ApplyQueryArguments(buildingsQueryArgumentList, context)
+                    .ProjectTo<BuildingModel>(mapper.ConfigurationProvider)
+                    .ToList()
+            );
+
             var guestQueryArgumentList = builder.Build<GuestType>().SupportOrderBy();
             Field<ListGraphType<GuestType>>("guests",
                 arguments: guestQueryArgumentList.ToQueryArguments(),
