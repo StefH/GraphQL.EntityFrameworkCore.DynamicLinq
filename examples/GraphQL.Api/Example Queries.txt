@@ -1,7 +1,29 @@
 query {
   customers {
+    customerID
     orders {
-      orderId
+      orderID
+    }
+  }
+}
+
+query {
+  customers(customerID: 1) {
+    customerID
+    customerName
+    orders {
+      orderID
+    }
+  }
+}
+
+query {
+  customers (customerID: 1, customerName: "faceBook", ordersOrderID: 1) {
+    customerID
+    customerName
+    orders {
+      orderID
+      orderDate
     }
   }
 }

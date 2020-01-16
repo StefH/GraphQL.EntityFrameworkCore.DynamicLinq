@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Enums;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Extensions;
@@ -37,10 +38,11 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
         {
             Guard.NotNull(graphQLType, nameof(graphQLType));
 
-            return PopulateQueryArgumentInfoList(graphQLType, string.Empty, string.Empty, 0);
+            return PopulateQueryArgumentInfoList(null, graphQLType, string.Empty, new List<string>(), 0);
         }
 
-        private QueryArgumentInfoList PopulateQueryArgumentInfoList(Type graphQLType, string parentGraphQLPath, string parentEntityPath, int level)
+        private QueryArgumentInfoList PopulateQueryArgumentInfoList(Type? parentGraphType, Type graphQLType,
+            string parentGraphQLPath, IReadOnlyCollection<string> parentEntityPath, int level)
         {
             var list = new QueryArgumentInfoList();
             if (level > _options.MaxRecursionLevel || !(Activator.CreateInstance(graphQLType) is IComplexGraphType complexGraphQLInstance))
@@ -48,24 +50,31 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                 return list;
             }
 
-            complexGraphQLInstance.Fields.ToList().ForEach(ft =>
+            foreach (var ft in complexGraphQLInstance.Fields)
             {
                 string graphPath = $"{parentGraphQLPath}{ft.Name}";
 
                 Type thisModel = graphQLType.ModelType();
                 string resolvedParentEntityPath = _propertyPathResolver.Resolve(thisModel, ft.Name);
-                string entityPath = !string.IsNullOrEmpty(parentEntityPath) ? $"{parentEntityPath}.{resolvedParentEntityPath}" : resolvedParentEntityPath;
+
+                var entityPath = new List<string>(parentEntityPath) { resolvedParentEntityPath };
 
                 bool isNonNullGraphType = ft.Type.IsNonNullGraphType();
                 Type childGraphQLType = ft.Type.GraphType();
                 if (childGraphQLType.IsObjectGraphType())
                 {
-                    list.AddRange(PopulateQueryArgumentInfoList(childGraphQLType, graphPath, entityPath, level + 1));
+                    list.AddRange(PopulateQueryArgumentInfoList(parentGraphType, childGraphQLType, graphPath, entityPath, level + 1));
+                }
+                else if (childGraphQLType.IsListGraphType() && _options.SupportListGraphType)
+                {
+                    var genericType = childGraphQLType.GenericTypeArguments.First();
+                    list.AddRange(PopulateQueryArgumentInfoList(childGraphQLType, genericType, graphPath, entityPath, level + 1));
                 }
                 else
                 {
                     list.Add(new QueryArgumentInfo
                     {
+                        ParentGraphType = parentGraphType,
                         QueryArgument = new QueryArgument(childGraphQLType) { Name = graphPath },
                         GraphQLPath = graphPath,
                         EntityPath = entityPath,
@@ -73,7 +82,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                         QueryArgumentInfoType = QueryArgumentInfoType.GraphQL
                     });
                 }
-            });
+            }
 
             return list;
         }

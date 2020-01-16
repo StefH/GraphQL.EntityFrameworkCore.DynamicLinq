@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Builders;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Extensions;
 using GraphQL.Types;
+using GraphQL.Utilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace GraphQL.Api
@@ -22,25 +24,16 @@ namespace GraphQL.Api
         public Customer Customer { get; set; }
     }
 
-public class CustomerGraph : ObjectGraphType<Customer>
-{
-    public CustomerGraph()
+    public class CustomerGraph : ObjectGraphType<Customer>
     {
-        Name = "Customer";
-        Field(x => x.CustomerID);
-        Field(x => x.CustomerName);
-
-        //Field<List<OrderGraph>, ICollection<Order>>()
-        //    .Name("Orders")
-        //    .Resolve(r => r.Source.Orders);
-
-        //Field(typeof(ListGraphType<OrderGraph>), "Orders", "The orders", resolve: context => context.Source.Orders);
-        Field<ListGraphType<OrderGraph>>("Orders", resolve: context => context.Source.Orders);
-        //Field<ListGraphType<StringGraphType>>("Orders");
-
-        //AddField(new FieldType { Name = "Orders", ResolvedType = typeof(typeof(ListGraphType<OrderGraph>) });
+        public CustomerGraph()
+        {
+            Name = "Customer";
+            Field(x => x.CustomerID);
+            Field(x => x.CustomerName);
+            Field<ListGraphType<OrderGraph>>("Orders", resolve: context => context.Source.Orders);
+        }
     }
-}
 
     public class OrderGraph : ObjectGraphType<Order>
     {

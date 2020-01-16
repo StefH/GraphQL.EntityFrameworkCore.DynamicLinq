@@ -68,9 +68,6 @@ namespace GraphQL.Api
             })
             .AddGraphTypes(ServiceLifetime.Scoped);
 
-            services.AddScoped<IGraphType, ListGraphType2<OrderGraph>>();
-
-
             services.AddGraphQLEntityFrameworkCoreDynamicLinq();
         }
     }

@@ -77,3 +77,20 @@ query {
     registerDate
   }
 }
+
+query {
+  buildings (orderBy: "name desc"){
+    id
+    name
+    rooms {
+      id
+      name
+      number
+      status
+      detail {
+        beds
+        windows
+      }
+    }
+  }
+}

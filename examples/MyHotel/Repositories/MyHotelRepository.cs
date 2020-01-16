@@ -50,5 +50,10 @@ namespace MyHotel.Repositories
         {
             return _myHotelDbContext.Guests;
         }
+
+        public IQueryable<Building> GetBuildingsQuery()
+        {
+            return _myHotelDbContext.Buildings;
+        }
     }
 }
