@@ -22,6 +22,15 @@ namespace GraphQL.Api
         public DateTime OrderDate { get; set; }
         public int CustomerID { get; set; }
         public Customer Customer { get; set; }
+        public virtual ICollection<OrderLine> OrderLines { get; set; }
+    }
+
+    public class OrderLine
+    {
+        public int Id { get; set; }
+        public string Details { get; set; }
+        public int OrderId { get; set; }
+        public Order Order { get; set; }
     }
 
     public class CustomerGraph : ObjectGraphType<Customer>
@@ -44,6 +53,19 @@ namespace GraphQL.Api
             Field(x => x.OrderDate);
             Field(x => x.CustomerID);
             Field<CustomerGraph>("Customer", resolve: context => context.Source.Customer);
+            Field<ListGraphType<OrderLineGraph>>("OrderLines", resolve: context => context.Source.OrderLines);
+        }
+    }
+
+    public class OrderLineGraph : ObjectGraphType<OrderLine>
+    {
+        public OrderLineGraph()
+        {
+            Name = "OrderLine";
+            Field(x => x.Id);
+            Field(x => x.Details);
+            Field(x => x.OrderId);
+            Field<OrderGraph>("Order", resolve: context => context.Source.Order);
         }
     }
 
@@ -51,6 +73,7 @@ namespace GraphQL.Api
     {
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderLine> OrderLines { get; set; }
 
         public TestDBContext(DbContextOptions<TestDBContext> options) : base(options)
         {
@@ -67,7 +90,11 @@ namespace GraphQL.Api
                 builder.Entity<Order>().ToTable("Orders");
                 builder.Entity<Order>().HasKey(x => x.OrderID);
 
+                builder.Entity<OrderLine>().ToTable("OrderLines");
+                builder.Entity<OrderLine>().HasKey(x => x.Id);
+
                 builder.Entity<Customer>().HasMany(x => x.Orders).WithOne(x => x.Customer);
+                builder.Entity<Order>().HasMany(x => x.OrderLines).WithOne(x => x.Order);
             }
         }
     }
@@ -96,6 +123,12 @@ namespace GraphQL.Api
             Field<ListGraphType<OrderGraph>>("orders",
                 arguments: orderArguments.ToQueryArguments(),
                 resolve: context => dbcontext.Orders.Include(x => x.Customer).ApplyQueryArguments(orderArguments, context)
+            );
+
+            var orderLineArguments = builder.Build<OrderLineGraph>().SupportOrderBy();
+            Field<ListGraphType<OrderLineGraph>>("orderlines",
+                arguments: orderLineArguments.ToQueryArguments(),
+                resolve: context => dbcontext.OrderLines.Include(x => x.Order).ApplyQueryArguments(orderLineArguments, context)
             );
         }
     }

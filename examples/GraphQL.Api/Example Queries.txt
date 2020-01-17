@@ -27,3 +27,14 @@ query {
     }
   }
 }
+
+query {
+  customers (ordersOrderLinesOrderCustomerID: 1) {
+    customerID
+    customerName
+    orders {
+      orderID
+      orderDate
+    }
+  }
+}

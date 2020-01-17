@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 
@@ -30,5 +31,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Utils.Entities
         public Building Building { get; set; }
 
         public int? BuildingId { get; set; }
+
+        public Reservation Reservation { get; set; }
     }
 }

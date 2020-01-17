@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
@@ -23,5 +24,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Utils.Entities
         public DateTime CheckinDate { get; set; }
 
         public DateTime CheckoutDate { get; set; }
+
+        public ICollection<Extra> Extras { get; set; }
     }
 }

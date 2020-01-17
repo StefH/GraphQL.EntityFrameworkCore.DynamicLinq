@@ -114,9 +114,45 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                 values.Add(value);
             }
 
-            var text = string.Join($" {Operators.And} ", predicates.Select(p =>
+            //string path = string.Empty;
+            //foreach (var entityPath in info.EntityPath)
+            //{
+            //    if (!entityPath.ParentGraphType.IsListGraphType())
+            //    {
+            //        path = $".{entityPath.Path}";
+            //    }
+            //    else
+            //    {
+            //        path = $".Any({entityPath.Path}";
+            //    }
+            //}
+
+            // Value       = "abc"
+            // EntityPath  = Rooms.Reservation.Extras.Test.A
+            // Linq        = Rooms.Any(r => r.Reservation.Extras.Any(e => e.Test == "abc"))
+            // DynamicLinq = Rooms.Any(Reservation.Extras.Any(Test.A == @0))
+
+            var list = new List<string>();
+            int listGraphCount = info.EntityPath.Count(ep => ep.ParentGraphType.IsListGraphType());
+            foreach (var ep in info.EntityPath)
             {
-                if (!info.ParentGraphType.IsListGraphType())
+                if (ep.ParentGraphType.IsListGraphType())
+                {
+                    list.Add($"Any({ep.Path}");
+                }
+                else
+                {
+                    list.Add(ep.Path);
+                }
+            }
+
+            var predicateText = string.Join($" {Operators.And} ", predicates.Select(p =>  $"{p.@operator} {p.placeHolder})"));
+
+            var text = string.Join(".", list) + new string(')', listGraphCount);
+
+            var text2 = string.Join($" {Operators.And} ", predicates.Select(p =>
+            {
+                if (!info.EntityPath.First().ParentGraphType.IsListGraphType())
                 {
                     string path = string.Join(".", info.EntityPath);
                     string wrap = info.IsNonNullGraphType ? path : $"np({path})";

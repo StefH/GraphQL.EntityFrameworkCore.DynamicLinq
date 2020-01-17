@@ -25,6 +25,15 @@ CREATE TABLE Orders
 
 GO
 
+CREATE TABLE OrderLines
+(
+	ID   	   int			 NOT NULL IDENTITY (1, 1) PRIMARY KEY,
+	Details    nvarchar(max) NULL,
+	OrderId    int			 NOT NULL REFERENCES Orders (Id)
+)
+
+GO
+
 INSERT INTO Customers
 (
 	CustomerName
@@ -62,4 +71,22 @@ INSERT INTO Orders
 )
 	VALUES
 			(GETDATE(), (SELECT CustomerID FROM Customers WHERE CustomerName = 'Microsoft'), 'Order1 from Microsoft');
+GO
+
+INSERT INTO OrderLines
+(
+	Details,
+	OrderId
+)
+	VALUES
+			('d-1', (SELECT TOP 1 OrderID FROM Orders));
+GO
+
+INSERT INTO OrderLines
+(
+	Details,
+	OrderId
+)
+	VALUES
+			('d-2', (SELECT TOP 1 OrderID FROM Orders));
 GO

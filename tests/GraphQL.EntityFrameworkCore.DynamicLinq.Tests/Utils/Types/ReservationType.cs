@@ -15,6 +15,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Utils.Types
             Field(x => x.CheckoutDate).Description("The leaving day");
             Field<GuestType>(nameof(Reservation.Guest));
             Field<RoomType>(nameof(Reservation.Room));
+            Field<ListGraphType<ExtraType>>("Extras", resolve: context => context.Source.Extras);
         }
     }
 }

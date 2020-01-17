@@ -15,6 +15,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Utils.Types
             Field(x => x.AllowedSmoking);
             Field<RoomStatusType>(nameof(Room.Status));
             Field<RoomDetailType>(nameof(Room.RoomDetail));
+            Field<ReservationType>(nameof(Room.Reservation));
         }
     }
 }

@@ -46,14 +46,17 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
         public void Build_With_ListGraphType_AndSupportIsSetToTrueReturnsCorrectQueryArgumentInfoList()
         {
             // Arrange
+            _options.MaxRecursionLevel = 3;
             _options.SupportListGraphType = true;
 
             // Act
             var list = _sut.Build<BuildingType>();
 
             // Assert
-            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(10);
+            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(23);
             list.Select(q => q.GraphQLPath).Should().BeEquivalentTo(
+                "Id",
+                "Name",
                 "RoomsId",
                 "RoomsName",
                 "RoomsNumber",
@@ -62,10 +65,23 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                 "RoomsRoomDetailId",
                 "RoomsRoomDetailWindows",
                 "RoomsRoomDetailBeds",
-                "Id",
-                "Name"
+                "RoomsReservationId",
+                "RoomsReservationCheckinDate",
+                "RoomsReservationCheckoutDate",
+                "RoomsReservationGuestId",
+                "RoomsReservationGuestName",
+                "RoomsReservationGuestRegisterDate",
+                "RoomsReservationGuestNullableInt",
+                "RoomsReservationRoomId",
+                "RoomsReservationRoomName",
+                "RoomsReservationRoomNumber",
+                "RoomsReservationRoomAllowedSmoking",
+                "RoomsReservationRoomStatus",
+                "RoomsReservationExtrasTest"
             );
-            list.Select(q => string.Join(".", q.EntityPath)).Should().BeEquivalentTo(
+            list.Select(q => string.Join(".", q.EntityPath.Select(ep => ep.Path))).Should().BeEquivalentTo(
+                "Id",
+                "Name",
                 "Rooms.Id",
                 "Rooms.Name",
                 "Rooms.Number",
@@ -74,8 +90,52 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                 "Rooms.RoomDetail.Id",
                 "Rooms.RoomDetail.Windows",
                 "Rooms.RoomDetail.Beds",
-                "Id",
-                "Name"
+                "Rooms.Reservation.Id",
+                "Rooms.Reservation.CheckinDate",
+                "Rooms.Reservation.CheckoutDate",
+                "Rooms.Reservation.Guest.Id",
+                "Rooms.Reservation.Guest.Name",
+                "Rooms.Reservation.Guest.RegisterDate",
+                "Rooms.Reservation.Guest.NullableInt",
+                "Rooms.Reservation.Room.Id",
+                "Rooms.Reservation.Room.Name",
+                "Rooms.Reservation.Room.Number",
+                "Rooms.Reservation.Room.AllowedSmoking",
+                "Rooms.Reservation.Room.Status",
+                "Rooms.Reservation.Extras.Test"
+            );
+
+            // Value       = "abc"
+            // EntityPath  = Rooms.Reservation.Extras.Test
+            // Linq        = Rooms.Any(r => r.Reservation.Extras.Any(e => e.Test == "abc"))
+            // DynamicLinq = Rooms.Any(Reservation.Extras.Any(Test == @0))
+            var buildings = new Building[0].AsQueryable();
+            var linq = buildings.Where(b => b.Rooms.Any(r => r.Reservation.Extras.Any(e => e.Test == "abc")));
+
+            list.Select(q => string.Join("_", q.EntityPath.Select(ep => $"{ep.ParentGraphType?.Name}:{ep.GraphType?.Name}"))).Should().BeEquivalentTo(
+                ":IntGraphType",
+                ":StringGraphType",
+                ":ListGraphType`1_ListGraphType`1:IntGraphType",
+                ":ListGraphType`1_ListGraphType`1:StringGraphType",
+                ":ListGraphType`1_ListGraphType`1:IntGraphType",
+                ":ListGraphType`1_ListGraphType`1:BooleanGraphType",
+                ":ListGraphType`1_ListGraphType`1:RoomStatusType",
+                ":ListGraphType`1_ListGraphType`1:RoomDetailType_ListGraphType`1:IntGraphType",
+                ":ListGraphType`1_ListGraphType`1:RoomDetailType_ListGraphType`1:IntGraphType",
+                ":ListGraphType`1_ListGraphType`1:RoomDetailType_ListGraphType`1:IntGraphType",
+                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:IntGraphType",
+                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:DateGraphType",
+                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:DateGraphType",
+                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:GuestType_ListGraphType`1:IntGraphType",
+                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:GuestType_ListGraphType`1:StringGraphType",
+                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:GuestType_ListGraphType`1:DateGraphType",
+                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:GuestType_ListGraphType`1:IntGraphType",
+                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:RoomType_ListGraphType`1:IntGraphType",
+                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:RoomType_ListGraphType`1:StringGraphType",
+                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:RoomType_ListGraphType`1:IntGraphType",
+                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:RoomType_ListGraphType`1:BooleanGraphType",
+                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:RoomType_ListGraphType`1:RoomStatusType",
+                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:ListGraphType`1_ListGraphType`1:StringGraphType"
             );
         }
 
