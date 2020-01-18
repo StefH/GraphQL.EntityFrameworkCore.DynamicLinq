@@ -50,7 +50,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                     QueryArgument = new QueryArgument(typeof(BooleanGraphType)) { Name = "AllowedSmoking" },
                     IsNonNullGraphType = true,
                     GraphQLPath = "AllowedSmoking",
-                    EntityPath = new List<string> { "AllowedSmoking" }
+                    EntityPath = new List<EntityPath> { new EntityPath { Path = "AllowedSmoking", GraphType = typeof(BooleanGraphType) } }
                 }
             };
             _context.Arguments.Add("allowedSmoking", false);
@@ -66,7 +66,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
         }
 
         [Fact]
-        public void Build_For_ListGraphType_When_ContextArgumentMatchesListArgument_AppliesWhere()
+        public void Build_For_ListGraphType_When_ContextArgumentMatchesListArgument_AppliesWhere_ForNullGraphType()
         {
             // Arrange
             var queryable = Enumerable.Empty<Building>().AsQueryable();
@@ -74,12 +74,15 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             {
                 new QueryArgumentInfo
                 {
-                    ParentGraphType = typeof(ListGraphType<RoomType>),
                     QueryArgumentInfoType = QueryArgumentInfoType.GraphQL,
                     QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "RoomsId" },
                     IsNonNullGraphType = true,
                     GraphQLPath = "RoomsId",
-                    EntityPath = new List<string> { "Rooms", "Id" }
+                    EntityPath = new List<EntityPath>
+                    {
+                        new EntityPath { Path = "Rooms", GraphType = typeof(ListGraphType<RoomType>), IsListGraphType = true },
+                        new EntityPath { Path = "Id", GraphType = typeof(IntGraphType) }
+                    }
                 }
             };
             _context.Arguments.Add("roomsId", 1);
@@ -91,7 +94,39 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
 
             // Assert
             _context.Errors.Count.Should().Be(0);
-            result.ToString().Should().Contain("Where(Param_0 => IIF((Param_0.Rooms != null), Param_0.Rooms.Any(Param_1 => (Param_1.Id == 1)), False))");
+            result.ToString().Should().Contain("Where(Param_0 => Param_0.Rooms.Any(Param_1 => (IIF((Param_1 != null), Convert(Param_1.Id, Nullable`1), null) == Convert(1, Nullable`1))))");
+        }
+
+        [Fact]
+        public void Build_For_ListGraphType_When_ContextArgumentMatchesListArgument_AppliesWhere_ForNonNullGraphType()
+        {
+            // Arrange
+            var queryable = Enumerable.Empty<Building>().AsQueryable();
+            var list = new QueryArgumentInfoList
+            {
+                new QueryArgumentInfo
+                {
+                    QueryArgumentInfoType = QueryArgumentInfoType.GraphQL,
+                    QueryArgument = new QueryArgument(typeof(NonNullGraphType<IntGraphType>)) { Name = "RoomsId" },
+                    IsNonNullGraphType = true,
+                    GraphQLPath = "RoomsId",
+                    EntityPath = new List<EntityPath>
+                    {
+                        new EntityPath { Path = "Rooms", GraphType = typeof(ListGraphType<RoomType>), IsListGraphType = true },
+                        new EntityPath { Path = "Id", GraphType = typeof(NonNullGraphType<IntGraphType>) }
+                    }
+                }
+            };
+            _context.Arguments.Add("roomsId", 1);
+
+            var builder = new DynamicQueryableBuilder<Building, object>(queryable, list, _context);
+
+            // Act
+            var result = builder.Build();
+
+            // Assert
+            _context.Errors.Count.Should().Be(0);
+            result.ToString().Should().Contain("Where(Param_0 => Param_0.Rooms.Any(Param_1 => (Param_1.Id == 1)))");
         }
 
         [Fact]
@@ -107,7 +142,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                     QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "Number" },
                     IsNonNullGraphType = true,
                     GraphQLPath = "Number",
-                    EntityPath = new List<string> { "Number" }
+                    EntityPath = new List<EntityPath> { new EntityPath { Path = "Number", GraphType = typeof(IntGraphType) } }
                 },
                 new QueryArgumentInfo
                 {
@@ -115,7 +150,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                     QueryArgument = new QueryArgument(typeof(StringGraphType)) { Name = "Name" },
                     IsNonNullGraphType = true,
                     GraphQLPath = "Name",
-                    EntityPath = new List<string> { "Name" }
+                    EntityPath = new List<EntityPath> { new EntityPath { Path = "Name", GraphType = typeof(StringGraphType) } }
                 },
                 new QueryArgumentInfo
                 {
@@ -149,7 +184,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                     QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "Number" },
                     IsNonNullGraphType = true,
                     GraphQLPath = "Number",
-                    EntityPath = new List<string> { "Number" }
+                    EntityPath = new List<EntityPath> { new EntityPath { Path = "Number", GraphType = typeof(IntGraphType) } }
                 },
                 new QueryArgumentInfo
                 {
@@ -157,7 +192,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                     QueryArgument = new QueryArgument(typeof(StringGraphType)) { Name = "Name" },
                     IsNonNullGraphType = true,
                     GraphQLPath = "Name",
-                    EntityPath = new List<string> { "Name" }
+                    EntityPath = new List<EntityPath> { new EntityPath { Path = "Name", GraphType = typeof(StringGraphType) } }
                 },
                 new QueryArgumentInfo
                 {
@@ -198,7 +233,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                     QueryArgument = new QueryArgument(typeof(DateGraphType)) { Name = "CheckinDate" },
                     IsNonNullGraphType = true,
                     GraphQLPath = "CheckinDate",
-                    EntityPath = new List<string> { "CheckinDate" }
+                    EntityPath = new List<EntityPath> { new EntityPath { Path = "CheckinDate", GraphType = typeof(DateGraphType) } }
                 }
             };
             _context.Arguments.Add("checkinDate", date);

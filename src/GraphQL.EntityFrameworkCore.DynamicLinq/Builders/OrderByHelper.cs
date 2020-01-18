@@ -100,7 +100,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                         throw new ArgumentException($"The \"EntityPath\" for field \"{match.Value}\" is null.");
                     }
 
-                    string path = string.Join(".", queryArgumentInfo.EntityPath);
+                    string path = string.Join(".", queryArgumentInfo.EntityPath.Select(ep => ep.Path));
                     orderByItems.Add((path, QueryArgumentInfoType.GraphQL, index));
                 }
 

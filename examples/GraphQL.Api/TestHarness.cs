@@ -122,13 +122,18 @@ namespace GraphQL.Api
             var orderArguments = builder.Build<OrderGraph>().SupportOrderBy();
             Field<ListGraphType<OrderGraph>>("orders",
                 arguments: orderArguments.ToQueryArguments(),
-                resolve: context => dbcontext.Orders.Include(x => x.Customer).ApplyQueryArguments(orderArguments, context)
+                resolve: context => dbcontext.Orders
+                    .Include(o => o.Customer).ThenInclude(c => c.Orders)
+                    .Include(o => o.OrderLines)
+                    .ApplyQueryArguments(orderArguments, context)
             );
 
             var orderLineArguments = builder.Build<OrderLineGraph>().SupportOrderBy();
             Field<ListGraphType<OrderLineGraph>>("orderlines",
                 arguments: orderLineArguments.ToQueryArguments(),
-                resolve: context => dbcontext.OrderLines.Include(x => x.Order).ApplyQueryArguments(orderLineArguments, context)
+                resolve: context => dbcontext.OrderLines
+                    .Include(ol => ol.Order)
+                    .ApplyQueryArguments(orderLineArguments, context)
             );
         }
     }

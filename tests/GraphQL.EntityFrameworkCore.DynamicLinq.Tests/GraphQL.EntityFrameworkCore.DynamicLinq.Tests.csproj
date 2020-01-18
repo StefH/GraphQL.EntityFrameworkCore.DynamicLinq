@@ -9,10 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Builders\DynamicQueryableBuilderTests.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Codecov" Version="1.7.1" />
     <PackageReference Include="coverlet.msbuild" Version="2.6.3">
       <PrivateAssets>all</PrivateAssets>

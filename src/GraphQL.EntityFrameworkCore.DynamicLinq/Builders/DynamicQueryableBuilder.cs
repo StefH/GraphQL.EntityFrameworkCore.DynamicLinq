@@ -126,7 +126,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                 .LastOrDefault(x => x.ep.IsListGraphType);
 
             var list = new List<string>();
-            string last = string.Empty;
+            string propertyPath = null;
             foreach (var entityPath in info.EntityPath)
             {
                 if (entityPath.IsListGraphType)
@@ -135,7 +135,9 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
 
                     if (entityPath == lastListGraphType.ep)
                     {
-                        last = $"np({string.Join(".", info.EntityPath.Skip(lastListGraphType.i + 1).Select(ep => ep.Path))})";
+                        var lastParts = info.EntityPath.Skip(lastListGraphType.i + 1).ToList();
+                        string pp = string.Join(".", lastParts.Select(lp => lp.Path));
+                        propertyPath = lastParts.Last().GraphType.IsNullable() ? $"np({pp})" : pp;
                         break;
                     }
                 }
@@ -145,9 +147,16 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                 }
             }
 
-            var predicateText = string.Join($" {Operators.And} ", predicates.Select(p => $"{last} {p.@operator} {p.placeHolder})"));
+            if (propertyPath == null)
+            {
+                propertyPath = $"{string.Join("", list)}".TrimEnd('.');
+                list.Clear();
+            }
 
-            string text = $"{string.Join("", list)}{predicateText}{new string(')', listGraphCount - 1)}";
+            string predicateText = string.Join($" {Operators.And} ", predicates.Select(p => $"{propertyPath} {p.@operator} {p.placeHolder}"));
+            string parentheses = new string(')', listGraphCount);
+
+            string text = $"{string.Join("", list)}{predicateText}{parentheses}";
 
             return (text, values.ToArray());
         }
