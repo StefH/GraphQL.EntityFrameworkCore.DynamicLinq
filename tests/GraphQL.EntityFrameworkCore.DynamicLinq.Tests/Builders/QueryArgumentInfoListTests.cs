@@ -78,7 +78,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                 QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "Id" },
                 IsNonNullGraphType = true,
                 GraphQLPath = "Id",
-                EntityPath = new List<string> { "Id" }
+                EntityPath = new List<EntityPath> { new EntityPath { Path = "Id" } }
             };
             _sut.Add(infoId);
             var infoX = new QueryArgumentInfo
@@ -87,7 +87,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                 QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "X" },
                 IsNonNullGraphType = true,
                 GraphQLPath = "X",
-                EntityPath = new List<string> { "X" }
+                EntityPath = new List<EntityPath> { new EntityPath { Path = "X" } }
             };
             _sut.Add(infoX);
 
@@ -109,7 +109,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                 QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "Id" },
                 IsNonNullGraphType = true,
                 GraphQLPath = "Id",
-                EntityPath = new List<string> { "Id" }
+                EntityPath = new List<EntityPath> { new EntityPath { Path = "Id" } }
             };
             _sut.Add(infoId);
             var infoX = new QueryArgumentInfo
@@ -118,7 +118,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                 QueryArgument = new QueryArgument(typeof(IntGraphType)) { Name = "X" },
                 IsNonNullGraphType = true,
                 GraphQLPath = "X",
-                EntityPath = new List<string> { "X" }
+                EntityPath = new List<EntityPath> { new EntityPath { Path = "X" } }
             };
             _sut.Add(infoX);
 

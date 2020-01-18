@@ -59,7 +59,9 @@ namespace GraphQL.Api
             services.AddScoped<IDependencyResolver>(provider => new FuncDependencyResolver(provider.GetRequiredService));
             services.Configure<QueryArgumentInfoListBuilderOptions>(Configuration.GetSection("QueryArgumentInfoListBuilderOptions"));
             services.AddScoped<SchemaTest>();
-            
+
+            services.AddScoped<CustomerGraph>(); // https://github.com/graphql-dotnet/graphql-dotnet/issues/1435
+
             services.AddGraphQL(o =>
             {
                 o.EnableMetrics = true;

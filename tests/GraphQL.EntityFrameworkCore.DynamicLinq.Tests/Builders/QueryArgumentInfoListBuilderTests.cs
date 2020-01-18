@@ -15,21 +15,21 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
 {
     public class QueryArgumentInfoListBuilderTests
     {
-        private readonly QueryArgumentInfoListBuilderOptions _options = new QueryArgumentInfoListBuilderOptions();
+        private readonly Mock<IOptions<QueryArgumentInfoListBuilderOptions>> _optionsMock;
         private readonly Mock<IPropertyPathResolver> _propertyPathResolverMock;
 
         private readonly QueryArgumentInfoListBuilder _sut;
 
         public QueryArgumentInfoListBuilderTests()
         {
-            var optionsMock = new Mock<IOptions<QueryArgumentInfoListBuilderOptions>>();
-            optionsMock.Setup(o => o.Value).Returns(_options);
+            _optionsMock = new Mock<IOptions<QueryArgumentInfoListBuilderOptions>>();
+            _optionsMock.SetupGet(o => o.Value).Returns(new QueryArgumentInfoListBuilderOptions());
 
             _propertyPathResolverMock = new Mock<IPropertyPathResolver>();
             _propertyPathResolverMock.Setup(pr => pr.Resolve(It.IsAny<Type>(), It.IsAny<string>(), It.IsAny<Type>()))
                 .Returns((Type sourceType, string sourcePath, Type destinationType) => sourcePath);
 
-            _sut = new QueryArgumentInfoListBuilder(optionsMock.Object, _propertyPathResolverMock.Object);
+            _sut = new QueryArgumentInfoListBuilder(_optionsMock.Object, _propertyPathResolverMock.Object);
         }
 
         [Fact]
@@ -46,8 +46,11 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
         public void Build_With_ListGraphType_AndSupportIsSetToTrueReturnsCorrectQueryArgumentInfoList()
         {
             // Arrange
-            _options.MaxRecursionLevel = 3;
-            _options.SupportListGraphType = true;
+            _optionsMock.SetupGet(o => o.Value).Returns(new QueryArgumentInfoListBuilderOptions
+            {
+                MaxRecursionLevel = 3,
+                SupportListGraphType = true
+            });
 
             // Act
             var list = _sut.Build<BuildingType>();
@@ -109,33 +112,33 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             // EntityPath  = Rooms.Reservation.Extras.Test
             // Linq        = Rooms.Any(r => r.Reservation.Extras.Any(e => e.Test == "abc"))
             // DynamicLinq = Rooms.Any(Reservation.Extras.Any(Test == @0))
-            var buildings = new Building[0].AsQueryable();
-            var linq = buildings.Where(b => b.Rooms.Any(r => r.Reservation.Extras.Any(e => e.Test == "abc")));
+            //var buildings = new Building[0].AsQueryable();
+            //var linq = buildings.Where(b => b.Rooms.Any(r => r.Reservation.Extras.Any(e => e.Test == "abc")));
 
-            list.Select(q => string.Join("_", q.EntityPath.Select(ep => $"{ep.ParentGraphType?.Name}:{ep.GraphType?.Name}"))).Should().BeEquivalentTo(
-                ":IntGraphType",
-                ":StringGraphType",
-                ":ListGraphType`1_ListGraphType`1:IntGraphType",
-                ":ListGraphType`1_ListGraphType`1:StringGraphType",
-                ":ListGraphType`1_ListGraphType`1:IntGraphType",
-                ":ListGraphType`1_ListGraphType`1:BooleanGraphType",
-                ":ListGraphType`1_ListGraphType`1:RoomStatusType",
-                ":ListGraphType`1_ListGraphType`1:RoomDetailType_ListGraphType`1:IntGraphType",
-                ":ListGraphType`1_ListGraphType`1:RoomDetailType_ListGraphType`1:IntGraphType",
-                ":ListGraphType`1_ListGraphType`1:RoomDetailType_ListGraphType`1:IntGraphType",
-                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:IntGraphType",
-                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:DateGraphType",
-                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:DateGraphType",
-                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:GuestType_ListGraphType`1:IntGraphType",
-                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:GuestType_ListGraphType`1:StringGraphType",
-                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:GuestType_ListGraphType`1:DateGraphType",
-                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:GuestType_ListGraphType`1:IntGraphType",
-                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:RoomType_ListGraphType`1:IntGraphType",
-                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:RoomType_ListGraphType`1:StringGraphType",
-                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:RoomType_ListGraphType`1:IntGraphType",
-                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:RoomType_ListGraphType`1:BooleanGraphType",
-                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:RoomType_ListGraphType`1:RoomStatusType",
-                ":ListGraphType`1_ListGraphType`1:ReservationType_ListGraphType`1:ListGraphType`1_ListGraphType`1:StringGraphType"
+            list.Select(q => string.Join(" ", q.EntityPath.Select(ep => $"{ep.IsListGraphType}:{ep.GraphType?.Name}"))).Should().BeEquivalentTo(
+                "False:IntGraphType",
+                "False:StringGraphType",
+                "True:RoomType False:IntGraphType",
+                "True:RoomType False:StringGraphType",
+                "True:RoomType False:IntGraphType",
+                "True:RoomType False:BooleanGraphType",
+                "True:RoomType False:RoomStatusType",
+                "True:RoomType False:RoomDetailType False:IntGraphType",
+                "True:RoomType False:RoomDetailType False:IntGraphType",
+                "True:RoomType False:RoomDetailType False:IntGraphType",
+                "True:RoomType False:ReservationType False:IntGraphType",
+                "True:RoomType False:ReservationType False:DateGraphType",
+                "True:RoomType False:ReservationType False:DateGraphType",
+                "True:RoomType False:ReservationType False:GuestType False:IntGraphType",
+                "True:RoomType False:ReservationType False:GuestType False:StringGraphType",
+                "True:RoomType False:ReservationType False:GuestType False:DateGraphType",
+                "True:RoomType False:ReservationType False:GuestType False:IntGraphType",
+                "True:RoomType False:ReservationType False:RoomType False:IntGraphType",
+                "True:RoomType False:ReservationType False:RoomType False:StringGraphType",
+                "True:RoomType False:ReservationType False:RoomType False:IntGraphType",
+                "True:RoomType False:ReservationType False:RoomType False:BooleanGraphType",
+                "True:RoomType False:ReservationType False:RoomType False:RoomStatusType",
+                "True:RoomType False:ReservationType True:ExtraType False:StringGraphType"
             );
         }
 
@@ -143,7 +146,10 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
         public void Build_With_ListGraphType_AndSupportIsSetToFalseReturnsCorrectQueryArgumentInfoList()
         {
             // Arrange
-            _options.SupportListGraphType = false;
+            _optionsMock.SetupGet(o => o.Value).Returns(new QueryArgumentInfoListBuilderOptions
+            {
+                SupportListGraphType = false
+            });
 
             // Act
             var list = _sut.Build<BuildingType>();
@@ -155,7 +161,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                 "Id",
                 "Name"
             );
-            list.Select(q => string.Join(".", q.EntityPath)).Should().BeEquivalentTo(
+            list.Select(q => string.Join(".", q.EntityPath.Select(ep => ep.Path))).Should().BeEquivalentTo(
                 "Rooms",
                 "Id",
                 "Name"
@@ -172,26 +178,12 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             var list = _sut.Build<RoomType>();
 
             // Assert
-            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(8);
+            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(12);
             list.Select(q => q.GraphQLPath).Should().BeEquivalentTo(
-                "Id",
-                "Name",
-                "Number",
-                "AllowedSmoking",
-                "Status",
-                "RoomDetailId",
-                "RoomDetailWindows",
-                "RoomDetailBeds"
+                "Id", "Name", "Number", "AllowedSmoking", "Status", "RoomDetailId", "RoomDetailWindows", "RoomDetailBeds", "ReservationId", "ReservationCheckinDate", "ReservationCheckoutDate", "ReservationExtras"
             );
-            list.Select(q => string.Join(".", q.EntityPath)).Should().BeEquivalentTo(
-                "Idee",
-                "Name",
-                "Number",
-                "AllowedSmoking",
-                "Status",
-                "RoomDetail.Idee",
-                "RoomDetail.Windows",
-                "RoomDetail.Beds"
+            list.Select(q => string.Join(".", q.EntityPath.Select(ep => ep.Path))).Should().BeEquivalentTo(
+                "Idee", "Name", "Number", "AllowedSmoking", "Status", "RoomDetail.Idee", "RoomDetail.Windows", "RoomDetail.Beds", "Reservation.Idee", "Reservation.CheckinDate", "Reservation.CheckoutDate", "Reservation.Extras"
             );
         }
 
@@ -205,10 +197,10 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             var list = _sut.Build<GuestType>();
 
             // Assert
-            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(4);
-            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL && q.IsNonNullGraphType).Should().Be(3);
-            list.Select(q => q.GraphQLPath).Should().BeEquivalentTo("Id", "Name", "RegisterDate", "NullableInt");
-            list.SelectMany(q => q.EntityPath).Should().BeEquivalentTo("Idee", "Name", "RegisterDate", "NullableInt");
+            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(8);
+            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL && q.IsNonNullGraphType).Should().Be(5);
+            list.Select(q => q.GraphQLPath).Should().BeEquivalentTo("Id", "Name", "RegisterDate", "NullableInt", "ReservationId", "ReservationCheckinDate", "ReservationCheckoutDate", "ReservationExtras");
+            list.Select(q => string.Join(".", q.EntityPath.Select(ep => ep.Path))).Should().BeEquivalentTo("Idee", "Name", "RegisterDate", "NullableInt", "Reservation.Idee", "Reservation.CheckinDate", "Reservation.CheckoutDate", "Reservation.Extras");
         }
 
         [Fact]
@@ -221,12 +213,11 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             var list = _sut.Build<GuestType>().SupportOrderBy();
 
             // Assert
-            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(4);
+            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(8);
             list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.OrderBy).Should().Be(1);
             list.First(q => q.QueryArgumentInfoType == QueryArgumentInfoType.OrderBy).QueryArgument.Name.Should().Be("OrderBy");
-            list.Select(q => q.GraphQLPath).Should().BeEquivalentTo("Id", "Name", "RegisterDate", "NullableInt", null);
-            //list.Select(q => q.EntityPath).Should().BeEquivalentTo("Idee", "Name", "RegisterDate", "NullableInt", null);
-            list.SelectMany(q => q.EntityPath).Should().BeEquivalentTo("Idee", "Name", "RegisterDate", "NullableInt");
+            list.Select(q => q.GraphQLPath).Should().BeEquivalentTo("Id", "Name", "RegisterDate", "NullableInt", "ReservationId", "ReservationCheckinDate", "ReservationCheckoutDate", "ReservationExtras", null);
+            list.Select(q => string.Join(".", q.EntityPath.Select(ep => ep.Path))).Should().BeEquivalentTo("Idee", "Name", "RegisterDate", "NullableInt", "Reservation.Idee", "Reservation.CheckinDate", "Reservation.CheckoutDate", "Reservation.Extras", "");
         }
 
         [Fact]
@@ -239,11 +230,11 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             var list = _sut.Build<GuestType>().SupportPaging();
 
             // Assert
-            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(4);
+            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(8);
             list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.OrderBy).Should().Be(0);
             list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.Paging).Should().Be(2);
-            list.Select(q => q.GraphQLPath).Should().BeEquivalentTo("Id", "Name", "RegisterDate", "NullableInt", null, null);
-            list.SelectMany(q => q.EntityPath).Should().BeEquivalentTo("Idee", "Name", "RegisterDate", "NullableInt");
+            list.Select(q => q.GraphQLPath).Should().BeEquivalentTo("Id", "Name", "RegisterDate", "NullableInt", "ReservationId", "ReservationCheckinDate", "ReservationCheckoutDate", "ReservationExtras", null, null);
+            list.Select(q => string.Join(".", q.EntityPath.Select(ep => ep.Path))).Should().BeEquivalentTo("Idee", "Name", "RegisterDate", "NullableInt", "Reservation.Idee", "Reservation.CheckinDate", "Reservation.CheckoutDate", "Reservation.Extras", "", "");
         }
 
         [Fact]
@@ -253,7 +244,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             var list = _sut.Build<ReservationType>();
 
             // Assert
-            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(15);
+            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(13);
             list.Select(q => q.GraphQLPath).Should().BeEquivalentTo(
                 "Id",
                 "CheckinDate",
@@ -267,11 +258,9 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                 "RoomNumber",
                 "RoomAllowedSmoking",
                 "RoomStatus",
-                "RoomRoomDetailId",
-                "RoomRoomDetailWindows",
-                "RoomRoomDetailBeds"
+                "Extras"
             );
-            list.Select(q => string.Join(".", q.EntityPath)).Should().BeEquivalentTo(
+            list.Select(q => string.Join(".", q.EntityPath.Select(ep => ep.Path))).Should().BeEquivalentTo(
                 "Id",
                 "CheckinDate",
                 "CheckoutDate",
@@ -284,9 +273,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                 "Room.Number",
                 "Room.AllowedSmoking",
                 "Room.Status",
-                "Room.RoomDetail.Id",
-                "Room.RoomDetail.Windows",
-                "Room.RoomDetail.Beds"
+                "Extras"
             );
         }
 
@@ -294,22 +281,27 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
         public void Build_With_GraphType_With_NestedGraphTypes_AndMaxRecurionsSetTo0_ReturnsCorrectQueryArgumentInfoList()
         {
             // Arrange
-            _options.MaxRecursionLevel = 0;
+            _optionsMock.SetupGet(o => o.Value).Returns(new QueryArgumentInfoListBuilderOptions
+            {
+                MaxRecursionLevel = 0
+            });
 
             // Act
             var list = _sut.Build<ReservationType>();
 
             // Assert
-            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(3);
+            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(4);
             list.Select(q => q.GraphQLPath).Should().BeEquivalentTo(
                 "Id",
                 "CheckinDate",
-                "CheckoutDate"
+                "CheckoutDate",
+                "Extras"
             );
-            list.SelectMany(q => q.EntityPath).Should().BeEquivalentTo(
+            list.SelectMany(q => q.EntityPath.Select(ep => ep.Path)).Should().BeEquivalentTo(
                 "Id",
                 "CheckinDate",
-                "CheckoutDate"
+                "CheckoutDate",
+                "Extras"
             );
         }
 
@@ -317,13 +309,16 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
         public void Build_With_GraphType_With_NestedGraphTypes_AndMaxRecurionsSetTo1_ReturnsCorrectQueryArgumentInfoList()
         {
             // Arrange
-            _options.MaxRecursionLevel = 1;
+            _optionsMock.SetupGet(o => o.Value).Returns(new QueryArgumentInfoListBuilderOptions
+            {
+                MaxRecursionLevel = 1
+            });
 
             // Act
             var list = _sut.Build<ReservationType>();
 
             // Assert
-            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(12);
+            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(13);
             list.Select(q => q.GraphQLPath).Should().BeEquivalentTo(
                 "Id",
                 "CheckinDate",
@@ -336,9 +331,10 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                 "RoomName",
                 "RoomNumber",
                 "RoomAllowedSmoking",
-                "RoomStatus"
+                "RoomStatus",
+                "Extras"
             );
-            list.Select(q => string.Join(".", q.EntityPath)).Should().BeEquivalentTo(
+            list.Select(q => string.Join(".", q.EntityPath.Select(ep => ep.Path))).Should().BeEquivalentTo(
                 "Id",
                 "CheckinDate",
                 "CheckoutDate",
@@ -350,7 +346,8 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
                 "Room.Name",
                 "Room.Number",
                 "Room.AllowedSmoking",
-                "Room.Status"
+                "Room.Status",
+                "Extras"
             );
         }
     }

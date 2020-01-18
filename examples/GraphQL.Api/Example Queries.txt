@@ -35,6 +35,9 @@ query {
     orders {
       orderID
       orderDate
+      orderLines {
+        CustomerID
+      }
     }
   }
 }

@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Builders;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Extensions;
 using GraphQL.Types;
-using GraphQL.Utilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace GraphQL.Api
@@ -116,7 +114,9 @@ namespace GraphQL.Api
             var customerArguments = builder.Build<CustomerGraph>().SupportOrderBy();
             Field<ListGraphType<CustomerGraph>>("customers",
                 arguments: customerArguments.ToQueryArguments(),
-                resolve: context => dbcontext.Customers.Include(c => c.Orders).ApplyQueryArguments(customerArguments, context)
+                resolve: context => dbcontext.Customers
+                    .Include(c => c.Orders).ThenInclude(o => o.OrderLines)
+                    .ApplyQueryArguments(customerArguments, context)
             );
 
             var orderArguments = builder.Build<OrderGraph>().SupportOrderBy();

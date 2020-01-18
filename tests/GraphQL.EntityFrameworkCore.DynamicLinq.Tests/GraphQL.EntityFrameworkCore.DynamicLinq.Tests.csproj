@@ -10,7 +10,6 @@
 
   <ItemGroup>
     <Compile Remove="Builders\DynamicQueryableBuilderTests.cs" />
-    <Compile Remove="Builders\QueryArgumentInfoListTests.cs" />
   </ItemGroup>
 
   <ItemGroup>
