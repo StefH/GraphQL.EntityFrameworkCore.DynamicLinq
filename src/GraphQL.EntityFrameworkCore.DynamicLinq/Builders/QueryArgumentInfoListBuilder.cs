@@ -16,13 +16,19 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
     internal class QueryArgumentInfoListBuilder : IQueryArgumentInfoListBuilder
     {
         private readonly IOptions<QueryArgumentInfoListBuilderOptions> _options;
+        [NotNull] private readonly IServiceProvider _serviceProvider;
         private readonly IPropertyPathResolver _propertyPathResolver;
 
-        public QueryArgumentInfoListBuilder([NotNull] IOptions<QueryArgumentInfoListBuilderOptions> options, [NotNull] IPropertyPathResolver propertyPathResolver)
+        public QueryArgumentInfoListBuilder(
+            [NotNull] IServiceProvider serviceProvider,
+            [NotNull] IOptions<QueryArgumentInfoListBuilderOptions> options,
+            [NotNull] IPropertyPathResolver propertyPathResolver)
         {
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
             Guard.NotNull(options, nameof(options));
             Guard.NotNull(propertyPathResolver, nameof(propertyPathResolver));
 
+            _serviceProvider = serviceProvider;
             _propertyPathResolver = propertyPathResolver;
             _options = options;
         }
@@ -50,32 +56,32 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                 return list;
             }
 
-            var complexGraphQLInstance = (IComplexGraphType)Activator.CreateInstance(graphQLType);
-            foreach (var ft in complexGraphQLInstance.Fields)
+            var complexGraphQLInstance = (IComplexGraphType)_serviceProvider.GetService(graphQLType);
+            foreach (var field in complexGraphQLInstance.Fields)
             {
-                string graphPath = $"{parentGraphQLPath}{ft.Name}";
+                string graphPath = $"{parentGraphQLPath}{field.Name}";
 
                 Type thisModel = graphQLType.ModelType();
-                bool isNonNullGraphType = ft.Type.IsNonNullGraphType();
-                Type fieldGraphQLType = ft.Type.GraphType();
+                bool isNonNullGraphType = field.Type.IsNonNullGraphType();
+                Type fieldGraphQLType = field.Type.GraphType();
                 bool fieldIsList = fieldGraphQLType.IsListGraphType();
 
                 var resolvedParentEntityPath = new EntityPath
                 {
                     IsListGraphType = fieldIsList,
                     IsNullable = fieldGraphQLType.IsNullable(),
-                    Path = _propertyPathResolver.Resolve(thisModel, ft.Name)
+                    Path = _propertyPathResolver.Resolve(thisModel, field.Name)
                 };
 
                 var entityPath = new List<EntityPath>(parentEntityPath) { resolvedParentEntityPath };
 
                 if (fieldGraphQLType.IsObjectGraphType())
                 {
-                    list.AddRange(PopulateQueryArgumentInfoList(fieldGraphQLType, graphPath, entityPath, level + 1));
+                    //list.AddRange(PopulateQueryArgumentInfoList(fieldGraphQLType, graphPath, entityPath, level + 1));
                 }
                 else if (fieldIsList && _options.Value.SupportListGraphType)
                 {
-                    list.AddRange(PopulateQueryArgumentInfoList(fieldGraphQLType.GenericTypeArguments.First(), graphPath, entityPath, level + 1));
+                    //list.AddRange(PopulateQueryArgumentInfoList(fieldGraphQLType.GenericTypeArguments.First(), graphPath, entityPath, level + 1));
                 }
                 else
                 {

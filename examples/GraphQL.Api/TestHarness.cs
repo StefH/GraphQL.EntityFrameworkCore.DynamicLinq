@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+// using System.Linq.Dynamic.Core;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Builders;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Extensions;
 using GraphQL.Types;
@@ -31,44 +33,69 @@ namespace GraphQL.Api
         public Order Order { get; set; }
     }
 
-    public class FilterInput<T, T2> : InputObjectGraphType
-        where T : EnumerationGraphType
-        where T2 : class
-    {
-        public FilterInput()
-        {
-            Name = "FilterInput" + typeof(T2).Name;
-            Field<T>("where");
-            Field<T>("and");
-            Field<T>("or");
-            Field<ListGraphType<FilterInput<T, T2>>>("andFilter");
-            Field<ListGraphType<FilterInput<T, T2>>>("orFilter");
-            Field<StringGraphType>("eq");
-            Field<StringGraphType>("not");
-        }
-    }
+    //public class FilterInput<T, T2> : InputObjectGraphType
+    //    where T : EnumerationGraphType
+    //    where T2 : class
+    //{
+    //    public FilterInput()
+    //    {
+    //        Name = "FilterInput" + typeof(T2).Name;
+    //        Field<T>("where");
+    //        Field<T>("and");
+    //        Field<T>("or");
+    //        Field<ListGraphType<FilterInput<T, T2>>>("andFilter");
+    //        Field<ListGraphType<FilterInput<T, T2>>>("orFilter");
+    //        Field<StringGraphType>("eq");
+    //        Field<StringGraphType>("not");
+    //    }
+    //}
 
     public class CustomerGraph : ObjectGraphType<Customer>
     {
-        public CustomerGraph()
+        public CustomerGraph(TestDBContext dbcontext, IQueryArgumentInfoListBuilder builder)
         {
-            Name = "Customer";
+            Name = nameof(Customer);
+
             Field(x => x.CustomerID);
             Field(x => x.CustomerName);
-            Field<ListGraphType<OrderGraph>>("Orders", resolve: context => context.Source.Orders);
+
+            var orderArguments = builder.Build<OrderGraph>().SupportOrderBy();
+            Field<ListGraphType<OrderGraph>>(nameof(Customer.Orders),
+                arguments: orderArguments.ToQueryArguments(),
+                resolve: context => dbcontext.Orders
+                    .Include(o => o.OrderLines)
+                    .ApplyQueryArguments(orderArguments, context)
+            );
         }
     }
 
     public class OrderGraph : ObjectGraphType<Order>
     {
-        public OrderGraph()
+        public OrderGraph(TestDBContext dbcontext, IQueryArgumentInfoListBuilder builder)
         {
-            Name = "Order";
+            Name = nameof(Order);
+
             Field(x => x.OrderID);
             Field(x => x.OrderDate);
             Field(x => x.CustomerID);
-            Field<CustomerGraph>("Customer", resolve: context => context.Source.Customer);
-            Field<ListGraphType<OrderLineGraph>>("OrderLines", resolve: context => context.Source.OrderLines);
+
+            //var customerArguments = builder.Build<CustomerGraph>().SupportOrderBy();
+            //Field<CustomerGraph>(nameof(Order.Customer),
+            //    arguments: customerArguments.ToQueryArguments(),
+            //    resolve: context => dbcontext.Customers
+            //        .Where(c => c.CustomerID == context.Source.CustomerID)
+            //        .ApplyQueryArguments(customerArguments, context)
+            //);
+
+            //Field<CustomerGraph>("Customer", resolve: context => context.Source.Customer);
+            //Field<ListGraphType<OrderLineGraph>>("OrderLines", resolve: context => context.Source.OrderLines);
+
+            var orderLineArguments = builder.Build<OrderLineGraph>().SupportOrderBy();
+            Field<ListGraphType<OrderLineGraph>>(nameof(Order.OrderLines),
+                arguments: orderLineArguments.ToQueryArguments(),
+                resolve: context => dbcontext.OrderLines
+                    .ApplyQueryArguments(orderLineArguments, context)
+            );
         }
     }
 
@@ -129,29 +156,28 @@ namespace GraphQL.Api
             Name = "Query";
 
             var customerArguments = builder.Build<CustomerGraph>().SupportOrderBy();
-            Field<ListGraphType<CustomerGraph>>("customers",
+            Field<ListGraphType<CustomerGraph>>("Customers",
                 arguments: customerArguments.ToQueryArguments(),
                 resolve: context => dbcontext.Customers
-                    .Include(c => c.Orders).ThenInclude(o => o.OrderLines)
                     .ApplyQueryArguments(customerArguments, context)
             );
 
-            var orderArguments = builder.Build<OrderGraph>().SupportOrderBy();
-            Field<ListGraphType<OrderGraph>>("orders",
-                arguments: orderArguments.ToQueryArguments(),
-                resolve: context => dbcontext.Orders
-                    .Include(o => o.Customer).ThenInclude(c => c.Orders)
-                    .Include(o => o.OrderLines)
-                    .ApplyQueryArguments(orderArguments, context)
-            );
+            //var orderArguments = builder.Build<OrderGraph>().SupportOrderBy();
+            //Field<ListGraphType<OrderGraph>>("Orders",
+            //    arguments: orderArguments.ToQueryArguments(),
+            //    resolve: context => dbcontext.Orders
+            //        //.Include(o => o.Customer).ThenInclude(c => c.Orders)
+            //        //.Include(o => o.OrderLines)
+            //        .ApplyQueryArguments(orderArguments, context)
+            //);
 
-            var orderLineArguments = builder.Build<OrderLineGraph>().SupportOrderBy();
-            Field<ListGraphType<OrderLineGraph>>("orderlines",
-                arguments: orderLineArguments.ToQueryArguments(),
-                resolve: context => dbcontext.OrderLines
-                    .Include(ol => ol.Order)
-                    .ApplyQueryArguments(orderLineArguments, context)
-            );
+            //var orderLineArguments = builder.Build<OrderLineGraph>().SupportOrderBy();
+            //Field<ListGraphType<OrderLineGraph>>("orderlines",
+            //    arguments: orderLineArguments.ToQueryArguments(),
+            //    resolve: context => dbcontext.OrderLines
+            //        //.Include(ol => ol.Order)
+            //        .ApplyQueryArguments(orderLineArguments, context)
+            //);
         }
     }
 }
