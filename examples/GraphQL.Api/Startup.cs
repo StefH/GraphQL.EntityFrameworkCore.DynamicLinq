@@ -9,11 +9,22 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace GraphQL.Api
 {
     public class Startup
     {
+        public static readonly ILoggerFactory MyLoggerFactory = LoggerFactory.Create(builder => {
+                builder
+                    //.AddFilter("Default", LogLevel.Information)
+                    .AddFilter("Microsoft", LogLevel.Information)
+                    //.AddFilter("System", LogLevel.Information)
+                    //.AddDebug()
+                    .AddConsole();
+            }
+        );
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -28,6 +39,9 @@ namespace GraphQL.Api
             services.AddDbContext<TestDBContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("LeaseWebDB"));
+
+                options.UseLoggerFactory(MyLoggerFactory);
+                options.EnableSensitiveDataLogging();
             });
 
             RegisterGraphQL(services);

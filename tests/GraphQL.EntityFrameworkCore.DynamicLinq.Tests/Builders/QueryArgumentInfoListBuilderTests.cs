@@ -113,7 +113,8 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             // Linq        = Rooms.Any(r => r.Reservation.Extras.Any(e => e.Test == "abc"))
             // DynamicLinq = Rooms.Any(Reservation.Extras.Any(Test == @0))
             //var buildings = new Building[0].AsQueryable();
-            //var linq = buildings.Where(b => b.Rooms.Any(r => r.Reservation.Extras.Any(e => e.Test == "abc")));
+            //var linq1 = buildings.Where(b => b.Rooms.Any(r => r.Reservation.Extras.Any(e => e.Test == "abc")));
+            //var x = buildings.Where(b => b.Rooms.Count(a => a.Reservation.Extras.Count(e => e.Test == "abc") > 0) > 0);
 
             list.Select(q => string.Join(" ", q.EntityPath.Select(ep => $"{ep.IsListGraphType}:{ep.GraphType?.Name}"))).Should().BeEquivalentTo(
                 "False:IntGraphType",
