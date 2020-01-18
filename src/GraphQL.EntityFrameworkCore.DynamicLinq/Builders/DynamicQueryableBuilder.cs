@@ -137,7 +137,8 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                     {
                         var lastParts = info.EntityPath.Skip(lastListGraphType.i + 1).ToList();
                         string pp = string.Join(".", lastParts.Select(lp => lp.Path));
-                        propertyPath = lastParts.Last().GraphType.IsNullable() ? $"np({pp})" : pp;
+                        // propertyPath = lastParts.Last().GraphType.IsNullable() ? $"np({pp})" : pp;
+                        propertyPath = lastParts.Last().IsNullable ? $"np({pp})" : pp;
                         break;
                     }
                 }

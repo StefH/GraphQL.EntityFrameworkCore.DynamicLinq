@@ -45,11 +45,12 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
             string parentGraphQLPath, IReadOnlyCollection<EntityPath> parentEntityPath, int level)
         {
             var list = new QueryArgumentInfoList();
-            if (level > _options.Value.MaxRecursionLevel || !(Activator.CreateInstance(graphQLType) is IComplexGraphType complexGraphQLInstance))
+            if (level > _options.Value.MaxRecursionLevel || graphQLType.GetInterface("IComplexGraphType") == null)
             {
                 return list;
             }
 
+            var complexGraphQLInstance = (IComplexGraphType)Activator.CreateInstance(graphQLType);
             foreach (var ft in complexGraphQLInstance.Fields)
             {
                 string graphPath = $"{parentGraphQLPath}{ft.Name}";
@@ -58,12 +59,11 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                 bool isNonNullGraphType = ft.Type.IsNonNullGraphType();
                 Type fieldGraphQLType = ft.Type.GraphType();
                 bool fieldIsList = fieldGraphQLType.IsListGraphType();
-                var graphTypeType = fieldIsList ? fieldGraphQLType.GenericTypeArguments.First() : fieldGraphQLType;
 
                 var resolvedParentEntityPath = new EntityPath
                 {
                     IsListGraphType = fieldIsList,
-                    GraphType = graphTypeType,
+                    IsNullable = fieldGraphQLType.IsNullable(),
                     Path = _propertyPathResolver.Resolve(thisModel, ft.Name)
                 };
 
@@ -75,7 +75,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                 }
                 else if (fieldIsList && _options.Value.SupportListGraphType)
                 {
-                    list.AddRange(PopulateQueryArgumentInfoList(graphTypeType, graphPath, entityPath, level + 1));
+                    list.AddRange(PopulateQueryArgumentInfoList(fieldGraphQLType.GenericTypeArguments.First(), graphPath, entityPath, level + 1));
                 }
                 else
                 {

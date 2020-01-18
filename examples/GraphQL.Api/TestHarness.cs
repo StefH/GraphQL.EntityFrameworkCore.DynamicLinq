@@ -31,6 +31,23 @@ namespace GraphQL.Api
         public Order Order { get; set; }
     }
 
+    public class FilterInput<T, T2> : InputObjectGraphType
+        where T : EnumerationGraphType
+        where T2 : class
+    {
+        public FilterInput()
+        {
+            Name = "FilterInput" + typeof(T2).Name;
+            Field<T>("where");
+            Field<T>("and");
+            Field<T>("or");
+            Field<ListGraphType<FilterInput<T, T2>>>("andFilter");
+            Field<ListGraphType<FilterInput<T, T2>>>("orFilter");
+            Field<StringGraphType>("eq");
+            Field<StringGraphType>("not");
+        }
+    }
+
     public class CustomerGraph : ObjectGraphType<Customer>
     {
         public CustomerGraph()
@@ -114,16 +131,10 @@ namespace GraphQL.Api
             var customerArguments = builder.Build<CustomerGraph>().SupportOrderBy();
             Field<ListGraphType<CustomerGraph>>("customers",
                 arguments: customerArguments.ToQueryArguments(),
-                resolve: context =>
-                {
-                    var q= dbcontext.Customers
-                        .Include(c => c.Orders).ThenInclude(o => o.OrderLines)
-                        .ApplyQueryArguments(customerArguments, context);
-
-                    string str = q.Expression.ToString();
-
-                    return q;
-                });
+                resolve: context => dbcontext.Customers
+                    .Include(c => c.Orders).ThenInclude(o => o.OrderLines)
+                    .ApplyQueryArguments(customerArguments, context)
+            );
 
             var orderArguments = builder.Build<OrderGraph>().SupportOrderBy();
             Field<ListGraphType<OrderGraph>>("orders",
