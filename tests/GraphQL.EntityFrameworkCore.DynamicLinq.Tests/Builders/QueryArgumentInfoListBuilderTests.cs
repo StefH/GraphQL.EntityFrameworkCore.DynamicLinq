@@ -115,32 +115,6 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             //var buildings = new Building[0].AsQueryable();
             //var linq1 = buildings.Where(b => b.Rooms.Any(r => r.Reservation.Extras.Any(e => e.Test == "abc")));
             //var x = buildings.Where(b => b.Rooms.Count(a => a.Reservation.Extras.Count(e => e.Test == "abc") > 0) > 0);
-
-            list.Select(q => string.Join(" ", q.EntityPath.Select(ep => $"{ep.IsListGraphType}:{ep.GraphType?.Name}"))).Should().BeEquivalentTo(
-                "False:IntGraphType",
-                "False:StringGraphType",
-                "True:RoomType False:IntGraphType",
-                "True:RoomType False:StringGraphType",
-                "True:RoomType False:IntGraphType",
-                "True:RoomType False:BooleanGraphType",
-                "True:RoomType False:RoomStatusType",
-                "True:RoomType False:RoomDetailType False:IntGraphType",
-                "True:RoomType False:RoomDetailType False:IntGraphType",
-                "True:RoomType False:RoomDetailType False:IntGraphType",
-                "True:RoomType False:ReservationType False:IntGraphType",
-                "True:RoomType False:ReservationType False:DateGraphType",
-                "True:RoomType False:ReservationType False:DateGraphType",
-                "True:RoomType False:ReservationType False:GuestType False:IntGraphType",
-                "True:RoomType False:ReservationType False:GuestType False:StringGraphType",
-                "True:RoomType False:ReservationType False:GuestType False:DateGraphType",
-                "True:RoomType False:ReservationType False:GuestType False:IntGraphType",
-                "True:RoomType False:ReservationType False:RoomType False:IntGraphType",
-                "True:RoomType False:ReservationType False:RoomType False:StringGraphType",
-                "True:RoomType False:ReservationType False:RoomType False:IntGraphType",
-                "True:RoomType False:ReservationType False:RoomType False:BooleanGraphType",
-                "True:RoomType False:ReservationType False:RoomType False:RoomStatusType",
-                "True:RoomType False:ReservationType True:ExtraType False:StringGraphType"
-            );
         }
 
         [Fact]
