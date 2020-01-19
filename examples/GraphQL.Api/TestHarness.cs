@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-// using System.Linq.Dynamic.Core;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Builders;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Extensions;
 using GraphQL.Types;
@@ -156,7 +155,7 @@ namespace GraphQL.Api
             Name = "Query";
 
             var customerArguments = builder.Build<CustomerGraph>().SupportOrderBy();
-            Field<ListGraphType<CustomerGraph>>("Customers",
+            Field<ListGraphType<CustomerGraph>>("customers",
                 arguments: customerArguments.ToQueryArguments(),
                 resolve: context => dbcontext.Customers
                     .ApplyQueryArguments(customerArguments, context)

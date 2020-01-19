@@ -113,53 +113,63 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                 values.Add(value);
             }
 
+            bool anyIsNullable = info.EntityPath.Any(ep => ep.IsNullable);
+
+            string propertyPath = string.Join(".", info.EntityPath.Select(ep => ep.Path));
+
+            string propertyPathNullPropagation = anyIsNullable ? $"np({propertyPath})" : propertyPath;
+
+            string text = string.Join($" {Operators.And} ", predicates.Select(p => $"{propertyPathNullPropagation} {p.@operator} {p.placeHolder}"));
+
+            return (text, values.ToArray());
+
             // Value       = "abc"
             // EntityPath  = Rooms.Reservation.Extras.Test.A
             // Linq        = Rooms.Any(r => r.Reservation.Extras.Any(e => e.Test == "abc"))
             // DynamicLinq = Rooms.Any(Reservation.Extras.Any(Test.A == @0))
 
 
-            int listGraphCount = info.EntityPath.Count(ep => ep.IsListGraphType);
+            //int listGraphCount = info.EntityPath.Count(ep => ep.IsListGraphType);
 
-            var lastListGraphType = info.EntityPath
-                .Select((ep, i) => (ep, i))
-                .LastOrDefault(x => x.ep.IsListGraphType);
+            //var lastListGraphType = info.EntityPath
+            //    .Select((ep, i) => (ep, i))
+            //    .LastOrDefault(x => x.ep.IsListGraphType);
 
-            var list = new List<string>();
-            string propertyPath = null;
-            foreach (var entityPath in info.EntityPath)
-            {
-                if (entityPath.IsListGraphType)
-                {
-                    list.Add($"{entityPath.Path}.Any(");
+            //var list = new List<string>();
+            //string propertyPath = null;
+            //foreach (var entityPath in info.EntityPath)
+            //{
+            //    if (entityPath.IsListGraphType)
+            //    {
+            //        list.Add($"{entityPath.Path}.Any(");
 
-                    if (entityPath == lastListGraphType.ep)
-                    {
-                        var lastParts = info.EntityPath.Skip(lastListGraphType.i + 1).ToList();
-                        string pp = string.Join(".", lastParts.Select(lp => lp.Path));
-                        // propertyPath = lastParts.Last().GraphType.IsNullable() ? $"np({pp})" : pp;
-                        propertyPath = lastParts.Last().IsNullable ? $"np({pp})" : pp;
-                        break;
-                    }
-                }
-                else
-                {
-                    list.Add($"{entityPath.Path}.");
-                }
-            }
+            //        if (entityPath == lastListGraphType.ep)
+            //        {
+            //            var lastParts = info.EntityPath.Skip(lastListGraphType.i + 1).ToList();
+            //            string pp = string.Join(".", lastParts.Select(lp => lp.Path));
+            //            // propertyPath = lastParts.Last().GraphType.IsNullable() ? $"np({pp})" : pp;
+            //            propertyPath = lastParts.Last().IsNullable ? $"np({pp})" : pp;
+            //            break;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        list.Add($"{entityPath.Path}.");
+            //    }
+            //}
 
-            if (propertyPath == null)
-            {
-                propertyPath = $"{string.Join("", list)}".TrimEnd('.');
-                list.Clear();
-            }
+            //if (propertyPath == null)
+            //{
+            //    propertyPath = $"{string.Join("", list)}".TrimEnd('.');
+            //    list.Clear();
+            //}
 
-            string predicateText = string.Join($" {Operators.And} ", predicates.Select(p => $"{propertyPath} {p.@operator} {p.placeHolder}"));
-            string parentheses = new string(')', listGraphCount);
+            //string predicateText = string.Join($" {Operators.And} ", predicates.Select(p => $"{propertyPath} {p.@operator} {p.placeHolder}"));
+            //string parentheses = new string(')', listGraphCount);
 
-            string text = $"{string.Join("", list)}{predicateText}{parentheses}";
+            //string text = $"{string.Join("", list)}{predicateText}{parentheses}";
 
-            return (text, values.ToArray());
+            //return (text, values.ToArray());
         }
     }
 
