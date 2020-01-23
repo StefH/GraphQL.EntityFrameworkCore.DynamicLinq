@@ -67,6 +67,7 @@ namespace GraphQL.Api
     public class EfGraphQLService<TDbContext> : IEfGraphQLService<TDbContext> where TDbContext : DbContext
     {
         // private readonly TDbContext _dbcontext;
+        private int count = 0;
         private readonly IQueryArgumentInfoListBuilder _builder;
 
         public EfGraphQLService(TDbContext dbcontext, IQueryArgumentInfoListBuilder builder)
@@ -134,10 +135,38 @@ namespace GraphQL.Api
             Type t = isList ? typeof(TGraphType).GenericTypeArguments.First() : typeof(TGraphType);
             var list = _service.Build(t);
 
-            var rss = new ResolveEfFieldContext<TDbContext, TSourceType>
+            return AddField(new FieldType
             {
-                DbContext = _service.DbContext
-            };
+                Name = name,
+
+                Type = typeof(TGraphType),
+                Arguments = list.ToQueryArguments(),
+
+                Resolver = new FuncFieldResolver<TSourceType, IQueryable<TReturn>>(context =>
+                {
+                    var rss = new ResolveEfFieldContext<TDbContext, TSourceType>
+                    {
+                        DbContext = _service.DbContext,
+                        Source = context.Source
+                    };
+                    var queryable = resolve(rss);
+
+                    return queryable.AsQueryable().ApplyQueryArguments(list, context);
+                })
+            });
+        }
+
+        public FieldType QField<TGraphType, TReturn>(
+            string name,
+            string description = null,
+            QueryArguments arguments = null,
+            // Func<ResolveFieldContext<TSourceType>, ICollection<TReturn>> resolve = null,
+            Func<ResolveEfFieldContext<TDbContext, TSourceType>, TReturn> resolve = null,
+            string deprecationReason = null)
+            where TReturn : class
+            where TGraphType : IGraphType
+        {
+            var list = _service.Build(typeof(TGraphType));
 
             return AddField(new FieldType
             {
@@ -146,13 +175,16 @@ namespace GraphQL.Api
                 Type = typeof(TGraphType),
                 Arguments = list.ToQueryArguments(),
 
-                // Func<ResolveFieldContext<TSourceType>, TReturnType> resolver
-                //Resolver = resolve != null ? (IFieldResolver)new FuncFieldResolver<TEntityType, IQueryable<TEntityType>>(resolve) : (IFieldResolver)null
-                Resolver = new FuncFieldResolver<TSourceType, IQueryable<TReturn>>(context =>
+                Resolver = new FuncFieldResolver<TSourceType, TReturn>(context =>
                 {
-                    var queryable = resolve(rss);
+                    var rss = new ResolveEfFieldContext<TDbContext, TSourceType>
+                    {
+                        DbContext = _service.DbContext,
+                        Source = context.Source
+                    };
+                    var result = resolve(rss);
 
-                    return queryable.AsQueryable().ApplyQueryArguments(list, context);
+                    return result; //queryable.AsQueryable().ApplyQueryArguments(list, context);
                 })
             });
         }
@@ -193,12 +225,6 @@ namespace GraphQL.Api
 
             var list = _service.Build(t);
 
-            var rss = new ResolveEfFieldContext<TDbContext, TGraphType>
-            {
-                DbContext = _service.DbContext,
-                //Source = this
-            };
-
             return AddField(new FieldType
             {
                 Name = name,
@@ -210,6 +236,11 @@ namespace GraphQL.Api
                 //Resolver = resolve != null ? (IFieldResolver)new FuncFieldResolver<TEntityType, IQueryable<TEntityType>>(resolve) : (IFieldResolver)null
                 Resolver = new FuncFieldResolver<TGraphType, IEnumerable<TReturn>>(context =>
                 {
+                    var rss = new ResolveEfFieldContext<TDbContext, TGraphType>
+                    {
+                        DbContext = _service.DbContext,
+                        Source = context.Source
+                    };
                     var queryable = resolve(rss);
 
                     return queryable.AsQueryable().ApplyQueryArguments(list, context);
@@ -239,12 +270,15 @@ namespace GraphQL.Api
         {
             Name = nameof(Customer);
 
-            QueryField(x => x.CustomerID);
-            QueryField(x => x.CustomerName);
+            //QueryField(x => x.CustomerID);
+            //QueryField(x => x.CustomerName);
+
+            Field(x => x.CustomerID);
+            Field(x => x.CustomerName);
 
             //QueryField<ListGraphType<OrderGraph>, Order>("orders", c => c.Source.Orders);
 
-            QField<ListGraphType<OrderGraph>, Order>("orders", resolve: context => context.Source.Orders);
+            QField<ListGraphType<Order1Graph>, Order>("orders", resolve: context => context.Source.Orders);
 
             //var orderArguments = builder.Build<OrderGraph>().SupportOrderBy();
             //Field<ListGraphType<OrderGraph>>(nameof(Customer.Orders),
@@ -295,15 +329,48 @@ namespace GraphQL.Api
             //        .ApplyQueryArguments(customerArguments, context)
             //);
 
-            //Field<CustomerGraph>("Customer", resolve: context => context.Source.Customer);
+            //Field<Customer1Graph>("Customer", resolve: context => context.Source.Customer);
             //Field<ListGraphType<OrderLineGraph>>("OrderLines", resolve: context => context.Source.OrderLines);
 
-            var orderLineArguments = builder.Build<OrderLineGraph>().SupportOrderBy();
-            Field<ListGraphType<OrderLineGraph>>(nameof(Order.OrderLines),
-                arguments: orderLineArguments.ToQueryArguments(),
-                resolve: context => dbcontext.OrderLines
-                    .ApplyQueryArguments(orderLineArguments, context)
-            );
+            //var orderLineArguments = builder.Build<OrderLineGraph>().SupportOrderBy();
+            //Field<ListGraphType<OrderLineGraph>>(nameof(Order.OrderLines),
+            //    arguments: orderLineArguments.ToQueryArguments(),
+            //    resolve: context => dbcontext.OrderLines
+            //        .ApplyQueryArguments(orderLineArguments, context)
+            //);
+        }
+    }
+
+    public class Order1Graph : EfObjectGraphType<TestDBContext, Order>
+    {
+        public Order1Graph(IEfGraphQLService<TestDBContext> service, IPropertyPathResolver r) : base(service, r)
+        {
+            Name = nameof(Order);
+
+            Field(x => x.OrderID);
+            Field(x => x.OrderDate);
+            Field(x => x.CustomerID);
+
+            QField<Customer1Graph, Customer>("customer", resolve: context => context.Source.Customer);
+            //QField<Customer1Graph>(x => x., resolve: context => context.Source.Customer);
+
+            //var customerArguments = builder.Build<CustomerGraph>().SupportOrderBy();
+            //Field<CustomerGraph>(nameof(Order.Customer),
+            //    arguments: customerArguments.ToQueryArguments(),
+            //    resolve: context => dbcontext.Customers
+            //        .Where(c => c.CustomerID == context.Source.CustomerID)
+            //        .ApplyQueryArguments(customerArguments, context)
+            //);
+
+            //Field<Customer1Graph>("Customer", resolve: context => context.Source.Customer);
+            //Field<ListGraphType<OrderLineGraph>>("OrderLines", resolve: context => context.Source.OrderLines);
+
+            //var orderLineArguments = builder.Build<OrderLineGraph>().SupportOrderBy();
+            //Field<ListGraphType<OrderLineGraph>>(nameof(Order.OrderLines),
+            //    arguments: orderLineArguments.ToQueryArguments(),
+            //    resolve: context => dbcontext.OrderLines
+            //        .ApplyQueryArguments(orderLineArguments, context)
+            //);
         }
     }
 
