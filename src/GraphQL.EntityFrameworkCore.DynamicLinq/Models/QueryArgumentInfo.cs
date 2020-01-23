@@ -9,14 +9,14 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Models
     {
         // public Type? ParentGraphType { get; internal set; }
 
-        public QueryArgumentInfoType QueryArgumentInfoType { get; internal set; }
+        public QueryArgumentInfoType QueryArgumentInfoType { get; set; }
 
-        public QueryArgument? QueryArgument { get; internal set; }
+        public QueryArgument? QueryArgument { get; set; }
 
-        public bool IsNonNullGraphType { get; internal set; }
+        public bool IsNonNullGraphType { get; set; }
 
-        public string? GraphQLPath { get; internal set; }
+        public string? GraphQLPath { get; set; }
 
-        public List<EntityPath> EntityPath { get; internal set; } = new List<EntityPath>();
+        public List<EntityPath> EntityPath { get; set; } = new List<EntityPath>();
     }
 }

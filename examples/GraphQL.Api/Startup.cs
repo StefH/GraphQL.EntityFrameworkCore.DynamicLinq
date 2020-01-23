@@ -74,7 +74,9 @@ namespace GraphQL.Api
             services.Configure<QueryArgumentInfoListBuilderOptions>(Configuration.GetSection("QueryArgumentInfoListBuilderOptions"));
             services.AddScoped<SchemaTest>();
 
-            services.AddScoped<CustomerGraph>(); // https://github.com/graphql-dotnet/graphql-dotnet/issues/1435
+            services.AddScoped(typeof(IEfGraphQLService<>), typeof(EfGraphQLService<>));
+
+            //services.AddScoped<CustomerGraph>(); // https://github.com/graphql-dotnet/graphql-dotnet/issues/1435
 
             services.AddGraphQL(o =>
             {

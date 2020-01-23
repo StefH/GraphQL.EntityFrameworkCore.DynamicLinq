@@ -1,5 +1,6 @@
 ﻿using System;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Models;
+using GraphQL.Types;
 using JetBrains.Annotations;
 
 namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
@@ -18,5 +19,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
         /// </summary>
         /// <param name="graphQLType">The type (must be a ObjectGraphType or ObjectGraphType`1)</param>
         QueryArgumentInfoList Build([NotNull] Type graphQLType);
+
+        QueryArgumentInfoList Build([NotNull] FieldType field, Type thisModel);
     }
 }

@@ -7,7 +7,7 @@ using GraphQL.Types;
 
 namespace GraphQL.EntityFrameworkCore.DynamicLinq.Extensions
 {
-    internal static class TypeExtensions
+    public static class TypeExtensions // TODO internal
     {
         public static bool IsNonNullGraphType(this Type type)
         {
