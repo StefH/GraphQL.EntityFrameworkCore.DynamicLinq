@@ -16,7 +16,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
     internal class QueryArgumentInfoListBuilder : IQueryArgumentInfoListBuilder
     {
         private readonly IOptions<QueryArgumentInfoListBuilderOptions> _options;
-        [NotNull] private readonly IServiceProvider _serviceProvider;
+        private readonly IServiceProvider _serviceProvider;
         private readonly IPropertyPathResolver _propertyPathResolver;
 
         public QueryArgumentInfoListBuilder(
