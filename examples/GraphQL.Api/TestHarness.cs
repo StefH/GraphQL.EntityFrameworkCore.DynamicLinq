@@ -180,6 +180,10 @@ namespace GraphQL.Api
         {
             var list = _service.Build(typeof(TGraphType));
             QueryArguments qa = list.Any() ? list.ToQueryArguments() : null;
+            if (!list.Any())
+            {
+                int yyyy = 0;
+            }
 
             return AddField(new FieldType
             {
@@ -212,13 +216,18 @@ namespace GraphQL.Api
             Type t = isList ? typeof(TGraphType).GenericTypeArguments.First() : typeof(TGraphType);
 
             var list = _service.Build(t);
+            QueryArguments qa = list.Any() ? list.ToQueryArguments() : null;
+            if (!list.Any())
+            {
+                int yyyy = 0;
+            }
 
             return AddField(new FieldType
             {
                 Name = name,
                 
                 Type = typeof(TGraphType),
-                Arguments = list.ToQueryArguments(),
+                Arguments = qa,
 
                 Resolver = new FuncFieldResolver<TGraphType, IEnumerable<TReturn>>(context =>
                 {
