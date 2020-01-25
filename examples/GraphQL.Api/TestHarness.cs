@@ -68,8 +68,6 @@ namespace GraphQL.Api
 
     public class EfGraphQLService<TDbContext> : IEfGraphQLService<TDbContext> where TDbContext : DbContext
     {
-        //private const int max = 2;
-        // private readonly TDbContext _dbcontext;
         private int count = 0;
         private readonly IQueryArgumentInfoListBuilder _builder;
         private readonly IOptions<QueryArgumentInfoListBuilderOptions> _options;
@@ -122,23 +120,22 @@ namespace GraphQL.Api
             _propertyPathResolver = propertyPathResolver;
         }
 
-        public FieldBuilder<TSourceType, TProperty> QueryField<TProperty>(
-            Expression<Func<TSourceType, TProperty>> expression,
-            bool nullable = false,
-            Type type = null)
-        {
-            var field = Field(expression, nullable, type);
+        //public FieldBuilder<TSourceType, TProperty> QueryField<TProperty>(
+        //    Expression<Func<TSourceType, TProperty>> expression,
+        //    bool nullable = false,
+        //    Type type = null)
+        //{
+        //    var field = Field(expression, nullable, type);
 
-            var queryArgumentInfoList = _service.Build(field.FieldType, typeof(TSourceType));
-            _list.AddRange(queryArgumentInfoList);
-            return field;
-        }
+        //    var queryArgumentInfoList = _service.Build(field.FieldType, typeof(TSourceType));
+        //    _list.AddRange(queryArgumentInfoList);
+        //    return field;
+        //}
 
         public FieldType QField<TGraphType, TReturn>(
             string name,
             string description = null,
             QueryArguments arguments = null,
-            // Func<ResolveFieldContext<TSourceType>, ICollection<TReturn>> resolve = null,
             Func<ResolveEfFieldContext<TDbContext, TSourceType>, ICollection<TReturn>> resolve = null,
             string deprecationReason = null)
             where TReturn : class
@@ -180,10 +177,6 @@ namespace GraphQL.Api
         {
             var list = _service.Build(typeof(TGraphType));
             QueryArguments qa = list.Any() ? list.ToQueryArguments() : null;
-            if (!list.Any())
-            {
-                int yyyy = 0;
-            }
 
             return AddField(new FieldType
             {
@@ -217,10 +210,7 @@ namespace GraphQL.Api
 
             var list = _service.Build(t);
             QueryArguments qa = list.Any() ? list.ToQueryArguments() : null;
-            if (!list.Any())
-            {
-                int yyyy = 0;
-            }
+
 
             return AddField(new FieldType
             {
@@ -330,7 +320,6 @@ namespace GraphQL.Api
             
             
             //QField<Customer1Graph>(x => x., resolve: context => context.Source.Customer);
-
         }
     }
 

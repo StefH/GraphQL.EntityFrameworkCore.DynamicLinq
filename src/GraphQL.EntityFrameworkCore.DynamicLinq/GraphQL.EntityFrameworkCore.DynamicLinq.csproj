@@ -5,7 +5,7 @@
     <Title>GraphQL.EntityFrameworkCore.DynamicLinq</Title>
     <Description>GraphQL EntityFrameworkCore Dynamic Linq extensions to query GraphQL types dynamically</Description>
     <PackageTags>GraphQL;ef;efcore;entityframework;core;entityframeworkcore;dynamiclinq;dynamic;linq</PackageTags>
-    <TargetFrameworks>netstandard1.3;netstandard2.0;net451</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net451</TargetFrameworks>
     <Authors>Stef Heyenrath</Authors>
     <Copyright>Stef Heyenrath</Copyright>
     <PackageReleaseNotes>See CHANGELOG.md</PackageReleaseNotes>
@@ -33,6 +33,16 @@
     </PackageReference>
     <PackageReference Include="GraphQL" Version="2.4.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.DynamicLinq" Version="1.0.19" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.1" />
   </ItemGroup>
 
 </Project>

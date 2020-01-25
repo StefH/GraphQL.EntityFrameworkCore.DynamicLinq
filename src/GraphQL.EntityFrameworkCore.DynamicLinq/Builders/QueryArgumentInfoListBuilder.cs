@@ -9,6 +9,7 @@ using GraphQL.EntityFrameworkCore.DynamicLinq.Resolvers;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Validation;
 using GraphQL.Types;
 using JetBrains.Annotations;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
@@ -62,12 +63,18 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
             string parentGraphQLPath, IReadOnlyCollection<EntityPath> parentEntityPath, int level)
         {
             var list = new QueryArgumentInfoList();
-            if (level > _options.Value.MaxRecursionLevel || graphQLType.GetInterface("IComplexGraphType") == null)
+            //if (level > _options.Value.MaxRecursionLevel || graphQLType.GetInterface("IComplexGraphType") == null)
+            //{
+            //    return list;
+            //}
+
+            if (graphQLType.GetInterface("IComplexGraphType") == null)
             {
                 return list;
             }
 
-            var complexGraphQLInstance = (IComplexGraphType)_serviceProvider.GetService(graphQLType);
+            //var complexGraphQLInstance = (IComplexGraphType)ActivatorUtilities.CreateInstance(_serviceProvider, graphQLType);
+            var complexGraphQLInstance = (IComplexGraphType) _serviceProvider.GetService(graphQLType);
             foreach (var field in complexGraphQLInstance.Fields)
             {
                 Type thisModel = graphQLType.ModelType();
@@ -92,7 +99,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                 Path = _propertyPathResolver.Resolve(thisModel, field.Name)
             };
 
-            var entityPath = new List<EntityPath>(parentEntityPath) {resolvedParentEntityPath};
+            var entityPath = new List<EntityPath>(parentEntityPath) { resolvedParentEntityPath };
 
             if (fieldGraphQLType.IsObjectGraphType())
             {
@@ -106,7 +113,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
             {
                 var q = new QueryArgumentInfo
                 {
-                    QueryArgument = new QueryArgument(fieldGraphQLType) {Name = graphPath},
+                    QueryArgument = new QueryArgument(fieldGraphQLType) { Name = graphPath },
                     GraphQLPath = graphPath,
                     EntityPath = entityPath,
                     IsNonNullGraphType = isNonNullGraphType,
