@@ -74,9 +74,9 @@ namespace GraphQL.Api
 
     public class SchemaTest : Schema
     {
-        public SchemaTest(IDependencyResolver resolver) : base(resolver)
+        public SchemaTest(IServiceProvider resolver) : base(resolver)
         {
-            Query = resolver.Resolve<QueryTest>();
+            Query = resolver.GetRequiredService<QueryTest>();
         }
     }
 

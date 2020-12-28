@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 
 namespace GraphQL.Api
 {
@@ -57,14 +58,14 @@ namespace GraphQL.Api
 
         private void RegisterGraphQL(IServiceCollection services)
         {
-            services.AddScoped<IDependencyResolver>(provider => new FuncDependencyResolver(provider.GetRequiredService));
+            services.AddScoped<IServiceProvider>(provider => new FuncServiceProvider(provider.GetRequiredService));
             services.Configure<QueryArgumentInfoListBuilderOptions>(Configuration.GetSection("QueryArgumentInfoListBuilderOptions"));
             services.AddScoped<SchemaTest>();
             
             services.AddGraphQL(o =>
             {
                 o.EnableMetrics = true;
-                o.ExposeExceptions = true;
+                
             })
             .AddGraphTypes(ServiceLifetime.Scoped);
 

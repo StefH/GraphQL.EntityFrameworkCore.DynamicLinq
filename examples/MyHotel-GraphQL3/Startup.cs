@@ -1,7 +1,7 @@
 using System;
 using AutoMapper;
 using GraphQL;
-using GraphQL.Client;
+using GraphQLClient = GraphQL.Client;
 using GraphQL.EntityFrameworkCore.DynamicLinq.DependencyInjection;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Options;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Resolvers;
@@ -20,6 +20,8 @@ using MyHotel.EntityFrameworkCore;
 using MyHotel.GraphQL;
 using MyHotel.GraphQL.Client;
 using MyHotel.Repositories;
+using GraphQL.Client.Serializer.Newtonsoft;
+using MyHotel.GraphQL.Types;
 
 namespace MyHotel
 {
@@ -40,7 +42,7 @@ namespace MyHotel
 
             //***< My services >*** 
             services.AddHttpClient<ReservationHttpGraphqlClient>(x => x.BaseAddress = new Uri(Configuration["GraphQlEndpoint"]));
-            services.AddSingleton(t => new GraphQLClient(Configuration["GraphQlEndpoint"]));
+            services.AddSingleton(t => new GraphQLClient.Http.GraphQLHttpClient(Configuration["GraphQlEndpoint"], new NewtonsoftJsonSerializer()));
             services.AddSingleton<ReservationGraphqlClient>();
 
             services.Configure<QueryArgumentInfoListBuilderOptions>(Configuration.GetSection("QueryArgumentInfoListBuilderOptions"));
@@ -83,10 +85,10 @@ namespace MyHotel
             services.AddGraphQL(x =>
                 {
                     x.EnableMetrics = true;
-                    x.ExposeExceptions = true; //set true only in dev mode.
+                   
                 })
                 .AddGraphTypes(ServiceLifetime.Scoped)
-                .AddUserContextBuilder(httpContext => httpContext.User.AsDictionary()) // Changed because of GraphQL.Server.Transports.AspNetCore Version="3.5.0-alpha0027"
+                .AddUserContextBuilder(httpContext => new GraphQLUserContext() { User = httpContext.User }) // Changed because of GraphQL.Server.Transports.AspNetCore Version="3.5.0-alpha0027"
                 .AddDataLoader()
                 //.AddGraphQLAuthorization(options =>
                 //{
@@ -99,14 +101,16 @@ namespace MyHotel
             //.AddUserContextBuilder(context => new GraphQLUserContext { User = context.User });
 
             //***</ GraphQL Services >*** 
+            services.AddControllers().AddNewtonsoftJson(o => o.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+            services.AddMvc(o => o.EnableEndpointRouting = false).AddNewtonsoftJson(o => o.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, MyHotelDbContext dbContext, IMapper mapper)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, MyHotelDbContext dbContext, IMapper mapper)
         {
             mapper.ConfigurationProvider.AssertConfigurationIsValid();
 
-            if (env.IsDevelopment())
+            if (env.EnvironmentName == Microsoft.Extensions.Hosting.Environments.Development)
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -138,7 +142,7 @@ namespace MyHotel
                 spa.Options.SourcePath = "ClientApp";
                 spa.Options.StartupTimeout = TimeSpan.FromSeconds(120);
 
-                if (env.IsDevelopment())
+                if (env.EnvironmentName == Microsoft.Extensions.Hosting.Environments.Development)
                 {
                     spa.UseAngularCliServer(npmScript: "start");
                 }

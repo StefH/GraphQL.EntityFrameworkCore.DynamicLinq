@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GraphQL.Client;
-using GraphQL.Common.Request;
+using GraphQL;
+using GraphQL.Client.Http;
 using MyHotel.Models;
 
 namespace MyHotel.GraphQL.Client
@@ -11,13 +11,16 @@ namespace MyHotel.GraphQL.Client
     /*This class is created to use GraphQl.Client library*/
     public class ReservationGraphqlClient
     {
-        private readonly GraphQLClient _client;
+        private readonly GraphQLHttpClient _client;
 
-        public ReservationGraphqlClient(GraphQLClient client)
+        public ReservationGraphqlClient(GraphQLHttpClient client)
         {
             _client = client;
         }
-
+        public class ReservationsType
+        {
+            public List<ReservationModel> Reservations { get; set; }
+        }
         public async Task<List<ReservationModel>> GetReservationsAsync()
         {
             var query = new GraphQLRequest
@@ -38,13 +41,13 @@ query reservation {
 "
             };
 
-            var response = await _client.PostAsync(query);
+            var response = await _client.SendQueryAsync<ReservationsType>(query);
             if (response.Errors != null && response.Errors.Any())
             {
                 throw new ApplicationException(response.Errors[0].Message);
             }
 
-            var reservations = response.GetDataFieldAs<List<ReservationModel>>("reservations");
+            var reservations = response.Data?.Reservations;
             return reservations;
         }
     }

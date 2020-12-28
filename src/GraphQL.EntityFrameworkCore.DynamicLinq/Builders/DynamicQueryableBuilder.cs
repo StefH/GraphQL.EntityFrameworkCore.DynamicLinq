@@ -16,11 +16,11 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
     {
         private readonly IQueryable<T> _queryable;
         private readonly QueryArgumentInfoList _list;
-        private readonly ResolveFieldContext<TGraphQL> _context;
+        private readonly IResolveFieldContext<TGraphQL> _context;
         private readonly IDictionary<string, object> _arguments;
         private readonly OrderByHelper<T> _helper;
 
-        public DynamicQueryableBuilder([NotNull] IQueryable<T> queryable, [NotNull] QueryArgumentInfoList list, [NotNull] ResolveFieldContext<TGraphQL> context)
+        public DynamicQueryableBuilder([NotNull] IQueryable<T> queryable, [NotNull] QueryArgumentInfoList list, [NotNull] IResolveFieldContext<TGraphQL> context)
         {
             Guard.NotNull(queryable, nameof(queryable));
             Guard.HasNoNulls(list, nameof(list));
