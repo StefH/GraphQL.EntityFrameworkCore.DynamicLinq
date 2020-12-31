@@ -70,7 +70,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Builders
                     var genericType = childGraphQLType.GenericTypeArguments.First();
                     list.AddRange(PopulateQueryArgumentInfoList(childGraphQLType, genericType, graphPath, entityPath, level + 1));
                 }
-                else
+                else if(!childGraphQLType.IsListGraphType())
                 {
                     list.Add(new QueryArgumentInfo
                     {
