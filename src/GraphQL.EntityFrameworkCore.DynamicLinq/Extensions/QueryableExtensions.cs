@@ -10,13 +10,13 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Extensions
     public static class QueryableExtensions
     {
         [PublicAPI]
-        public static IQueryable<T> ApplyQueryArguments<T>([NotNull] this IQueryable<T> query, [NotNull] QueryArgumentInfoList list, [NotNull] ResolveFieldContext<object> context)
+        public static IQueryable<T> ApplyQueryArguments<T>([NotNull] this IQueryable<T> query, [NotNull] QueryArgumentInfoList list, [NotNull] IResolveFieldContext<object> context)
         {
             return ApplyQueryArguments<T, object>(query, list, context);
         }
 
         [PublicAPI]
-        public static IQueryable<T> ApplyQueryArguments<T, TGraphQL>([NotNull] this IQueryable<T> query, [NotNull] QueryArgumentInfoList list, [NotNull] ResolveFieldContext<TGraphQL> context)
+        public static IQueryable<T> ApplyQueryArguments<T, TGraphQL>([NotNull] this IQueryable<T> query, [NotNull] QueryArgumentInfoList list, [NotNull] IResolveFieldContext<TGraphQL> context)
         {
             Guard.NotNull(query, nameof(query));
             Guard.HasNoNulls(list, nameof(list));

@@ -1,13 +1,14 @@
 ﻿using GraphQL;
 using GraphQL.Types;
-
+using System;
+using GraphQL.Utilities;
 namespace MyHotel.GraphQL
 {
     public class MyHotelSchema : Schema
     {
-        public MyHotelSchema(IDependencyResolver resolver) : base(resolver)
+        public MyHotelSchema(IServiceProvider resolver) : base(resolver)
         {
-            Query = resolver.Resolve<MyHotelQuery>();
+            Query = resolver.GetRequiredService<MyHotelQuery>();
         }
     }
 }

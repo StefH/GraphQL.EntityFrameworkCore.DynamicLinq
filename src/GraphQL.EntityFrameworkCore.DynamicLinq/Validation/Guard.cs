@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Internal;
 
 // Copied from https://github.com/aspnet/EntityFramework/blob/dev/src/Shared/Check.cs
@@ -52,7 +53,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Validation
             {
                 NotNullOrEmpty(parameterName, nameof(parameterName));
 
-                throw new ArgumentException(CoreStrings.CollectionArgumentIsEmpty(parameterName));
+                throw new ArgumentException(AbstractionsStrings.CollectionArgumentIsEmpty(parameterName));
             }
 
             return value;
@@ -68,7 +69,7 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Validation
             }
             else if (value.Trim().Length == 0)
             {
-                e = new ArgumentException(CoreStrings.ArgumentIsEmpty(parameterName));
+                e = new ArgumentException(AbstractionsStrings.ArgumentIsEmpty(parameterName));
             }
 
             if (e != null)

@@ -89,14 +89,13 @@ namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Builders
             var list = _sut.Build<BuildingType>();
 
             // Assert
-            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(3);
-            list.Select(q => q.GraphQLPath).Should().BeEquivalentTo(
-                "Rooms",
+            list.Count(q => q.QueryArgumentInfoType == QueryArgumentInfoType.GraphQL).Should().Be(2);
+            list.Select(q => q.GraphQLPath).Should().BeEquivalentTo(                
                 "Id",
                 "Name"
             );
             list.Select(q => string.Join(".", q.EntityPath)).Should().BeEquivalentTo(
-                "Rooms",
+              
                 "Id",
                 "Name"
             );
