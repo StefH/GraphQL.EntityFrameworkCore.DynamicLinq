@@ -2,14 +2,13 @@
 using GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Utils.Entities;
 using GraphQL.Types;
 
-namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Utils.Types
+namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Utils.Types;
+
+[ExcludeFromCodeCoverage]
+public class RoomStatusType : EnumerationGraphType<RoomStatus>
 {
-    [ExcludeFromCodeCoverage]
-    public class RoomStatusType : EnumerationGraphType<RoomStatus>
+    public RoomStatusType()
     {
-        public RoomStatusType()
-        {
-            Description = "Shows if the room is available or not.";
-        }
+        Description = "Shows if the room is available or not.";
     }
 }

@@ -1,18 +1,17 @@
-﻿namespace GraphQL.EntityFrameworkCore.DynamicLinq.Matchers
+﻿namespace GraphQL.EntityFrameworkCore.DynamicLinq.Matchers;
+
+/// <summary>
+/// MatchBehaviour
+/// </summary>
+internal enum MatchBehaviour
 {
     /// <summary>
-    /// MatchBehaviour
+    /// Accept on match (default)
     /// </summary>
-    internal enum MatchBehaviour
-    {
-        /// <summary>
-        /// Accept on match (default)
-        /// </summary>
-        AcceptOnMatch,
+    AcceptOnMatch,
 
-        /// <summary>
-        /// Reject on match
-        /// </summary>
-        RejectOnMatch
-    }
+    /// <summary>
+    /// Reject on match
+    /// </summary>
+    RejectOnMatch
 }

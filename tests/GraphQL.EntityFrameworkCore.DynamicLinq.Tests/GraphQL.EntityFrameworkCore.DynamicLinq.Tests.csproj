@@ -1,31 +1,33 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<LangVersion>latest</LangVersion>
+		<ProjectGuid>{31DC2567-C3FE-467D-84BE-FB5D956E6121}</ProjectGuid>
 
-    <ProjectGuid>{31DC2567-C3FE-467D-84BE-FB5D956E6121}</ProjectGuid>
-    <!-- https://github.com/tonerdo/coverlet/issues/6 -->
-    <!--<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>-->
-  </PropertyGroup>
+		<!-- https://github.com/tonerdo/coverlet/issues/6 -->
+		<!--<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>-->
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Codecov" Version="1.7.1" />
-    <PackageReference Include="coverlet.msbuild" Version="2.6.3">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="FluentAssertions" Version="5.10.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
-    <PackageReference Include="Moq" Version="4.13.1" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Codecov" Version="1.7.1" />
+		<PackageReference Include="coverlet.msbuild" Version="2.6.3">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="FluentAssertions" Version="5.10.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
+		<PackageReference Include="Moq" Version="4.13.1" />
+		<PackageReference Include="xunit" Version="2.4.1" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\GraphQL.EntityFrameworkCore.DynamicLinq\GraphQL.EntityFrameworkCore.DynamicLinq.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\GraphQL.EntityFrameworkCore.DynamicLinq\GraphQL.EntityFrameworkCore.DynamicLinq.csproj" />
+	</ItemGroup>
 
 </Project>

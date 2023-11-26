@@ -1,28 +1,26 @@
 ﻿using System.Linq;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Builders;
 using GraphQL.EntityFrameworkCore.DynamicLinq.Models;
-using GraphQL.EntityFrameworkCore.DynamicLinq.Validation;
-using GraphQL.Types;
 using JetBrains.Annotations;
+using Stef.Validation;
 
-namespace GraphQL.EntityFrameworkCore.DynamicLinq.Extensions
+namespace GraphQL.EntityFrameworkCore.DynamicLinq.Extensions;
+
+public static class QueryableExtensions
 {
-    public static class QueryableExtensions
+    [PublicAPI]
+    public static IQueryable<T> ApplyQueryArguments<T>(this IQueryable<T> query, QueryArgumentInfoList list, ResolveFieldContext<object> context)
     {
-        [PublicAPI]
-        public static IQueryable<T> ApplyQueryArguments<T>([NotNull] this IQueryable<T> query, [NotNull] QueryArgumentInfoList list, [NotNull] ResolveFieldContext<object> context)
-        {
-            return ApplyQueryArguments<T, object>(query, list, context);
-        }
+        return ApplyQueryArguments<T, object>(query, list, context);
+    }
 
-        [PublicAPI]
-        public static IQueryable<T> ApplyQueryArguments<T, TGraphQL>([NotNull] this IQueryable<T> query, [NotNull] QueryArgumentInfoList list, [NotNull] ResolveFieldContext<TGraphQL> context)
-        {
-            Guard.NotNull(query, nameof(query));
-            Guard.HasNoNulls(list, nameof(list));
-            Guard.NotNull(context, nameof(context));
+    [PublicAPI]
+    public static IQueryable<T> ApplyQueryArguments<T, TGraphQL>(this IQueryable<T> query, QueryArgumentInfoList list, ResolveFieldContext<TGraphQL> context)
+    {
+        Guard.NotNull(query);
+        Guard.HasNoNulls(list);
+        Guard.NotNull(context);
 
-            return new DynamicQueryableBuilder<T, TGraphQL>(query, list, context).Build();
-        }
+        return new DynamicQueryableBuilder<T, TGraphQL>(query, list, context).Build();
     }
 }

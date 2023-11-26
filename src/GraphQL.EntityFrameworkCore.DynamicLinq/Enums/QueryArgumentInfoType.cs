@@ -1,11 +1,10 @@
-﻿namespace GraphQL.EntityFrameworkCore.DynamicLinq.Enums
+﻿namespace GraphQL.EntityFrameworkCore.DynamicLinq.Enums;
+
+public enum QueryArgumentInfoType
 {
-    public enum QueryArgumentInfoType
-    {
-        GraphQL,
+    GraphQL,
 
-        OrderBy,
+    OrderBy,
 
-        Paging
-    }
+    Paging
 }

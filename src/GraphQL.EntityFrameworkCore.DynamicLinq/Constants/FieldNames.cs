@@ -1,11 +1,10 @@
-﻿namespace GraphQL.EntityFrameworkCore.DynamicLinq.Constants
+﻿namespace GraphQL.EntityFrameworkCore.DynamicLinq.Constants;
+
+internal static class FieldNames
 {
-    internal static class FieldNames
-    {
-        public const string OrderByFieldName = "OrderBy";
+    public const string OrderByFieldName = "OrderBy";
 
-        public const string PageFieldName = "Page";
+    public const string PageFieldName = "Page";
 
-        public const string PageSizeFieldName = "PageSize";
-    }
+    public const string PageSizeFieldName = "PageSize";
 }
