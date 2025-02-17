@@ -32,7 +32,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="GraphQL" Version="2.4.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.DynamicLinq" Version="1.0.19" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.DynamicLinq" Version="2.6.0" />
   </ItemGroup>
 
 </Project>
