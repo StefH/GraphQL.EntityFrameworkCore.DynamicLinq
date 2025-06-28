@@ -7,8 +7,8 @@ Add EntityFramework Core Dynamic IQueryable support to GraphQL.
 |-|-|
 | &nbsp;&nbsp;**Build Azure** | [![Build Status](https://dev.azure.com/stef/GraphQL.EntityFrameworkCore.DynamicLinq/_apis/build/status/StefH.GraphQL.EntityFrameworkCore.DynamicLinq)](https://dev.azure.com/stef/GraphQL.EntityFrameworkCore.DynamicLinq/_build/latest?definitionId=26) |
 | &nbsp;&nbsp;**Codecov** | [![codecov](https://codecov.io/gh/StefH/GraphQL.EntityFrameworkCore.DynamicLinq/branch/master/graph/badge.svg)](https://codecov.io/gh/StefH/GraphQL.EntityFrameworkCore.DynamicLinq) |
-| &nbsp;&nbsp;**NuGet** | [![NuGet: GraphQL.EntityFrameworkCore.DynamicLinq](https://buildstats.info/nuget/GraphQL.EntityFrameworkCore.DynamicLinq)](https://www.nuget.org/packages/GraphQL.EntityFrameworkCore.DynamicLinq)
-| &nbsp;&nbsp;**MyGet (preview)** | [![MyGet: GraphQL.EntityFrameworkCore.DynamicLinq](https://buildstats.info/myget/graphql_entityframeworkcore_dynamiclinq/GraphQL.EntityFrameworkCore.DynamicLinq)](https://www.myget.org/feed/graphql_entityframeworkcore_dynamiclinq/package/nuget/GraphQL.EntityFrameworkCore.DynamicLinq) |
+| &nbsp;&nbsp;**NuGet** | [![NuGet: GraphQL.EntityFrameworkCore.DynamicLinq](https://img.shields.io/nuget/v/GraphQL.EntityFrameworkCore.DynamicLinq)](https://www.nuget.org/packages/GraphQL.EntityFrameworkCore.DynamicLinq)
+| &nbsp;&nbsp;**MyGet (preview)** | [![MyGet: GraphQL.EntityFrameworkCore.DynamicLinq](https://img.shields.io/myget/graphql_entityframeworkcore_dynamiclinq/GraphQL.EntityFrameworkCore.DynamicLinq)](https://www.myget.org/feed/graphql_entityframeworkcore_dynamiclinq/package/nuget/GraphQL.EntityFrameworkCore.DynamicLinq) |
 
 
 # How To
@@ -135,3 +135,11 @@ See example projec: [examples/MyHotel](https://github.com/StefH/GraphQL.EntityFr
 - [EntityFramework Core IQueryable](https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.dbset-1.system-linq-iqueryable-provider)
 - [GraphQL](https://github.com/graphql-dotnet/graphql-dotnet)
 - My example project is based on [ebicoglu/AspNetCoreGraphQL-MyHotel](https://github.com/ebicoglu/AspNetCoreGraphQL-MyHotel).
+
+## Sponsors
+
+[Entity Framework Extensions](https://entityframework-extensions.net/?utm_source=StefH) and [Dapper Plus](https://dapper-plus.net/?utm_source=StefH) are major sponsors and proud to contribute to the development of **GraphQL.EntityFrameworkCore.DynamicLinq**.
+
+[![Entity Framework Extensions](https://raw.githubusercontent.com/StefH/resources/main/sponsor/entity-framework-extensions-sponsor.png)](https://entityframework-extensions.net/bulk-insert?utm_source=StefH)
+
+[![Dapper Plus](https://raw.githubusercontent.com/StefH/resources/main/sponsor/dapper-plus-sponsor.png)](https://dapper-plus.net/bulk-insert?utm_source=StefH)
