@@ -2,17 +2,16 @@
 using GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Utils.Entities;
 using GraphQL.Types;
 
-namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Utils.Types
+namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Utils.Types;
+
+[ExcludeFromCodeCoverage]
+public class GuestType : ObjectGraphType<Guest>
 {
-    [ExcludeFromCodeCoverage]
-    public class GuestType : ObjectGraphType<Guest>
+    public GuestType()
     {
-        public GuestType()
-        {
-            Field(x => x.Id);
-            Field(x => x.Name);
-            Field(x => x.RegisterDate);
-            Field(x => x.NullableInt, nullable: true);
-        }
+        Field(x => x.Id);
+        Field(x => x.Name);
+        Field(x => x.RegisterDate);
+        Field(x => x.NullableInt, nullable: true);
     }
 }

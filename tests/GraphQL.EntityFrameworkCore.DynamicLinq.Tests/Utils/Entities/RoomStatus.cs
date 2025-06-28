@@ -1,8 +1,7 @@
-﻿namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Utils.Entities
+﻿namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Utils.Entities;
+
+public enum RoomStatus
 {
-    public enum RoomStatus
-    {
-        Unavailable = 0,
-        Available = 1,
-    }
+    Unavailable = 0,
+    Available = 1,
 }
