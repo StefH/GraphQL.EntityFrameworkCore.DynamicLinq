@@ -1,7 +1,5 @@
 rem https://github.com/StefH/GitHubReleaseNotes
 
-SET version=1.0.2
+SET version=1.0.3
 
-GitHubReleaseNotes --output ReleaseNotes.md --skip-empty-releases --exclude-labels question invalid documentation --version %version% --token %GH_TOKEN%
-
-GitHubReleaseNotes --output PackageReleaseNotes.txt --skip-empty-releases --exclude-labels question invalid documentation --template PackageReleaseNotes.template --version %version% --token %GH_TOKEN%
+GitHubReleaseNotes --output CHANGELOG.md --skip-empty-releases --exclude-labels wontfix dependencies question invalid documentation --version %version% --token %GH_TOKEN%
