@@ -2,16 +2,15 @@
 using GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Utils.Entities;
 using GraphQL.Types;
 
-namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Utils.Types
+namespace GraphQL.EntityFrameworkCore.DynamicLinq.Tests.Utils.Types;
+
+[ExcludeFromCodeCoverage]
+public class RoomDetailType : ObjectGraphType<RoomDetail>
 {
-    [ExcludeFromCodeCoverage]
-    public class RoomDetailType : ObjectGraphType<RoomDetail>
+    public RoomDetailType()
     {
-        public RoomDetailType()
-        {
-            Field(x => x.Id);
-            Field(x => x.Windows);
-            Field(x => x.Beds);
-        }
+        Field(x => x.Id);
+        Field(x => x.Windows);
+        Field(x => x.Beds);
     }
 }
